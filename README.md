@@ -1,4 +1,5 @@
-# Trello Clone
+# FlowLoG
+
 
 A Kanban-style project management application built with **Next.js**, **Node.js (Express)**, and **PostgreSQL (Prisma)**.
 
