@@ -23,7 +23,7 @@
   flex-direction: column;
   padding: 16px 24px 24px 16px;
   /* Added left padding for icons */
-  color: var(--text-primary);
+  color: #ffffff;
 }
 
 .closeBtn {
@@ -63,7 +63,7 @@
   border: none;
   font-size: 20px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #ffffff;
   width: 100%;
   padding: 4px 8px;
   margin: -4px -8px;
@@ -202,7 +202,7 @@
 .sectionTitle {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #ffffff;
   margin: 0;
 }
 
@@ -211,7 +211,7 @@
   min-height: 56px;
   padding: 12px;
   border-radius: 3px;
-  color: var(--text-primary);
+  color: #ffffff;
   font-size: 14px;
   border: 1px solid transparent;
   cursor: pointer;
@@ -543,4 +543,67 @@
 
 .deleteBtn:hover {
   color: #ff5630;
+}
+
+
+/* Label Edit/Delete Buttons */
+.editLabelBtn, .deleteLabelBtn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.1s;
+  font-size: 12px;
+}
+
+.editLabelBtn:hover, .deleteLabelBtn:hover {
+  opacity: 1;
+}
+
+.deleteLabelBtn:hover {
+  color: #ff5630;
+}
+
+.labelPreview {
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+
+.descPlaceholder {
+  background: #22272b;
+  min-height: 56px;
+  padding: 12px;
+  border-radius: 6px;
+  color: #9fadbc;
+  font-size: 14px;
+  line-height: 1.6;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.descPlaceholder:hover {
+  background: #2c333a;
+}
+
+.saveBtn {
+  background: #579dff;
+  color: #1d2125;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: #85b8ff;
 }

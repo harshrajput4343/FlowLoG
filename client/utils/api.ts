@@ -91,6 +91,14 @@ export const apiClient = {
   deleteLabel: async (id: number) => {
     await fetch(`${API_BASE}/labels/${id}`, { method: 'DELETE' });
   },
+  updateLabel: async (id: number, name: string, color: string) => {
+    const res = await fetch(`${API_BASE}/labels/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, color })
+    });
+    return res.json();
+  },
   addLabelToCard: async (cardId: number, labelId: number) => {
     const res = await fetch(`${API_BASE}/labels/card`, {
       method: 'POST',

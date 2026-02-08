@@ -1,47 +1,50 @@
 .mainHeader {
-  height: 48px;
+  height: 56px;
   background: var(--header-bg);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: 0 16px;
   color: var(--text-primary);
-  gap: 8px;
+  gap: 16px;
 }
 
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  font-size: 20px;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 22px;
   color: var(--text-primary);
   text-decoration: none;
-  padding: 4px;
-  border-radius: 6px;
-  transition: transform 0.15s ease, filter 0.15s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .logo:hover {
+  background: rgba(255, 255, 255, 0.1);
   transform: scale(1.02);
-  filter: brightness(1.1);
 }
 
 .logoIcon {
-  flex-shrink: 0;
-  border-radius: 4px;
-  object-fit: contain;
+  font-size: 24px;
 }
 
 .logoText {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
   letter-spacing: -0.5px;
 }
 
@@ -61,8 +64,8 @@
 
 .headerSearchInput {
   width: 100%;
-  padding: 8px 12px 8px 36px;
-  border-radius: 4px;
+  padding: 10px 14px 10px 40px;
+  border-radius: 8px;
   border: 1px solid var(--input-border);
   background: var(--input-bg);
   color: var(--text-primary);
@@ -77,12 +80,12 @@
 .headerSearchInput:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 1px var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
 }
 
 .searchIcon {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-secondary);
@@ -92,15 +95,15 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .headerIconBtn {
   background: none;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -116,11 +119,11 @@
 }
 
 .createBtn {
-  background: var(--accent-color);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 4px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
   font-size: 14px;
   transition: all 0.15s ease;
   border: none;
@@ -129,25 +132,26 @@
 
 .createBtn:hover {
   filter: brightness(1.1);
+  transform: translateY(-1px);
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: white;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 .avatar:hover {
-  opacity: 0.85;
+  transform: scale(1.05);
 }
 
 /* Search Dropdown */
@@ -158,11 +162,11 @@
   right: 0;
   background: #282e33;
   border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   margin-top: 8px;
   padding: 8px 0;
   z-index: 1000;
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: auto;
 }
 
@@ -171,14 +175,15 @@
   font-weight: 600;
   color: #9fadbc;
   text-transform: uppercase;
-  padding: 8px 12px;
+  letter-spacing: 0.5px;
+  padding: 10px 14px 6px;
 }
 
 .searchResultItem {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   cursor: pointer;
   color: #b6c2cf;
   transition: background 0.1s;
@@ -189,14 +194,14 @@
 }
 
 .searchResultIcon {
-  width: 32px;
-  height: 24px;
+  width: 36px;
+  height: 28px;
   border-radius: 4px;
   flex-shrink: 0;
 }
 
 .noResults {
-  padding: 16px;
+  padding: 20px;
   color: #9fadbc;
   text-align: center;
   font-size: 14px;

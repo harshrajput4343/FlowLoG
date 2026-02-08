@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -65,7 +66,7 @@ model List {
 model Card {
   id          Int          @id @default(autoincrement())
   title       String
-  description String?      @db.Text
+  description String?
   order       Int          @default(0)
   dueDate     DateTime?
   listId      Int

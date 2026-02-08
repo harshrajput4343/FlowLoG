@@ -52,7 +52,17 @@ export const CardDetailModal = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dueDate, setDueDate] = useState(card.dueDate || '');
 
+  // Label editing state
+  const [editingLabelId, setEditingLabelId] = useState<number | null>(null);
+  const [editLabelName, setEditLabelName] = useState('');
+  const [editLabelColor, setEditLabelColor] = useState('');
+  const [localLabels, setLocalLabels] = useState(boardLabels);
+
   const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setLocalLabels(boardLabels);
+  }, [boardLabels]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,9 +80,14 @@ export const CardDetailModal = ({
     }
   };
 
-  const handleSaveDesc = () => {
-    onUpdate({ ...card, description });
-    setEditingDesc(false);
+  const handleSaveDesc = async () => {
+    try {
+      await apiClient.updateCard(card.id, { description });
+      onUpdate({ ...card, description });
+      setEditingDesc(false);
+    } catch (err) {
+      console.error('Failed to save description:', err);
+    }
   };
 
   const toggleLabel = async (label: Label) => {
@@ -108,11 +123,53 @@ export const CardDetailModal = ({
       await apiClient.addLabelToCard(card.id, newLabel.id);
       const updatedLabels = [...card.labels, newLabel];
       onUpdate({ ...card, labels: updatedLabels });
+      setLocalLabels([...localLabels, newLabel]);
       setNewLabelName('');
       setShowCreateLabel(false);
       onLabelsChange?.();
     } catch (err) {
       console.error('Failed to create label:', err);
+    }
+  };
+
+  const startEditLabel = (label: Label, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingLabelId(label.id);
+    setEditLabelName(label.name || '');
+    setEditLabelColor(label.color);
+  };
+
+  const handleUpdateLabel = async () => {
+    if (!editingLabelId || !editLabelName.trim()) return;
+    try {
+      await apiClient.updateLabel(editingLabelId, editLabelName, editLabelColor);
+      // Update local labels
+      setLocalLabels(localLabels.map(l =>
+        l.id === editingLabelId ? { ...l, name: editLabelName, color: editLabelColor } : l
+      ));
+      // Update card labels if this label is on the card
+      const updatedCardLabels = card.labels.map(l =>
+        l.id === editingLabelId ? { ...l, name: editLabelName, color: editLabelColor } : l
+      );
+      onUpdate({ ...card, labels: updatedCardLabels });
+      setEditingLabelId(null);
+      onLabelsChange?.();
+    } catch (err) {
+      console.error('Failed to update label:', err);
+    }
+  };
+
+  const handleDeleteLabel = async (labelId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Delete this label from all cards?')) return;
+    try {
+      await apiClient.deleteLabel(labelId);
+      setLocalLabels(localLabels.filter(l => l.id !== labelId));
+      const updatedCardLabels = card.labels.filter(l => l.id !== labelId);
+      onUpdate({ ...card, labels: updatedCardLabels });
+      onLabelsChange?.();
+    } catch (err) {
+      console.error('Failed to delete label:', err);
     }
   };
 
@@ -164,7 +221,7 @@ export const CardDetailModal = ({
             {/* Metadata (Members, Labels) */}
             <div className={styles.metadata}>
               <div className={styles.metaGroup}>
-                <div className={styles.metaLabel}>Members</div>
+                <div className={styles.metaLabel}>MEMBERS</div>
                 <div className={styles.memberList}>
                   {card.members.map(m => (
                     <div key={m.id} className={styles.memberAvatar} title={m.name}>
@@ -193,7 +250,7 @@ export const CardDetailModal = ({
               </div>
 
               <div className={styles.metaGroup}>
-                <div className={styles.metaLabel}>Labels</div>
+                <div className={styles.metaLabel}>LABELS</div>
                 <div className={styles.labelList}>
                   {card.labels.map(l => (
                     <div key={l.id} className={styles.labelChip} style={{ backgroundColor: l.color }}>
@@ -206,36 +263,17 @@ export const CardDetailModal = ({
                     <div className={styles.popupMenu} style={{ left: '100px' }}>
                       <div className={styles.popupHeader}>Labels</div>
 
-                      {/* Existing labels */}
-                      {boardLabels.map(l => (
-                        <div
-                          key={l.id}
-                          className={styles.popupItem}
-                          onClick={() => toggleLabel(l)}
-                        >
-                          <div className={styles.labelColor} style={{ backgroundColor: l.color }}></div>
-                          <span style={{ flex: 1 }}>{l.name || 'Unnamed'}</span>
-                          {card.labels.some(cl => cl.id === l.id) && <span>✓</span>}
-                        </div>
-                      ))}
-
-                      <div className={styles.popupDivider}></div>
-
-                      {/* Create new label */}
-                      {!showCreateLabel ? (
-                        <button
-                          className={styles.createLabelBtn}
-                          onClick={() => setShowCreateLabel(true)}
-                        >
-                          + Create a new label
-                        </button>
-                      ) : (
+                      {/* Editing a label */}
+                      {editingLabelId !== null ? (
                         <div className={styles.createLabelForm}>
+                          <div className={styles.labelPreview} style={{ backgroundColor: editLabelColor }}>
+                            {editLabelName || 'Preview'}
+                          </div>
                           <input
                             type="text"
                             placeholder="Label name..."
-                            value={newLabelName}
-                            onChange={(e) => setNewLabelName(e.target.value)}
+                            value={editLabelName}
+                            onChange={(e) => setEditLabelName(e.target.value)}
                             className={styles.labelInput}
                             autoFocus
                           />
@@ -243,18 +281,88 @@ export const CardDetailModal = ({
                             {LABEL_COLORS.map(c => (
                               <div
                                 key={c.color}
-                                className={`${styles.colorOption} ${selectedColor === c.color ? styles.colorSelected : ''}`}
+                                className={`${styles.colorOption} ${editLabelColor === c.color ? styles.colorSelected : ''}`}
                                 style={{ backgroundColor: c.color }}
-                                onClick={() => setSelectedColor(c.color)}
+                                onClick={() => setEditLabelColor(c.color)}
                                 title={c.name}
                               />
                             ))}
                           </div>
                           <div className={styles.createLabelActions}>
-                            <button onClick={handleCreateLabel} className={styles.createBtn}>Create</button>
-                            <button onClick={() => setShowCreateLabel(false)} className={styles.cancelBtn}>Cancel</button>
+                            <button onClick={handleUpdateLabel} className={styles.createBtn}>Save</button>
+                            <button onClick={() => setEditingLabelId(null)} className={styles.cancelBtn}>Cancel</button>
                           </div>
                         </div>
+                      ) : (
+                        <>
+                          {/* Existing labels */}
+                          {localLabels.map(l => (
+                            <div
+                              key={l.id}
+                              className={styles.popupItem}
+                              onClick={() => toggleLabel(l)}
+                            >
+                              <div className={styles.labelColor} style={{ backgroundColor: l.color }}></div>
+                              <span style={{ flex: 1 }}>{l.name || 'Unnamed'}</span>
+                              {card.labels.some(cl => cl.id === l.id) && <span style={{ color: '#61bd4f' }}>✓</span>}
+                              <button
+                                className={styles.editLabelBtn}
+                                onClick={(e) => startEditLabel(l, e)}
+                                title="Edit label"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                className={styles.deleteLabelBtn}
+                                onClick={(e) => handleDeleteLabel(l.id, e)}
+                                title="Delete label"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          ))}
+
+                          <div className={styles.popupDivider}></div>
+
+                          {/* Create new label */}
+                          {!showCreateLabel ? (
+                            <button
+                              className={styles.createLabelBtn}
+                              onClick={() => setShowCreateLabel(true)}
+                            >
+                              + Create a new label
+                            </button>
+                          ) : (
+                            <div className={styles.createLabelForm}>
+                              <div className={styles.labelPreview} style={{ backgroundColor: selectedColor }}>
+                                {newLabelName || 'Preview'}
+                              </div>
+                              <input
+                                type="text"
+                                placeholder="Label name..."
+                                value={newLabelName}
+                                onChange={(e) => setNewLabelName(e.target.value)}
+                                className={styles.labelInput}
+                                autoFocus
+                              />
+                              <div className={styles.colorGrid}>
+                                {LABEL_COLORS.map(c => (
+                                  <div
+                                    key={c.color}
+                                    className={`${styles.colorOption} ${selectedColor === c.color ? styles.colorSelected : ''}`}
+                                    style={{ backgroundColor: c.color }}
+                                    onClick={() => setSelectedColor(c.color)}
+                                    title={c.name}
+                                  />
+                                ))}
+                              </div>
+                              <div className={styles.createLabelActions}>
+                                <button onClick={handleCreateLabel} className={styles.createBtn}>Create</button>
+                                <button onClick={() => setShowCreateLabel(false)} className={styles.cancelBtn}>Cancel</button>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
@@ -268,7 +376,7 @@ export const CardDetailModal = ({
               <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>Description</h3>
                 {editingDesc && (
-                  <button style={{ background: '#579dff', color: '#1d2125', padding: '4px 8px', borderRadius: '3px' }} onClick={handleSaveDesc}>Save</button>
+                  <button className={styles.saveBtn} onClick={handleSaveDesc}>Save</button>
                 )}
               </div>
               {editingDesc ? (
@@ -277,13 +385,12 @@ export const CardDetailModal = ({
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   autoFocus
-                  style={{ width: '100%', height: '120px' }}
+                  placeholder="Add a more detailed description..."
                 />
               ) : (
                 <div
-                  className={styles.descEditor}
+                  className={styles.descPlaceholder}
                   onClick={() => setEditingDesc(true)}
-                  style={{ cursor: 'pointer' }}
                 >
                   {description || 'Add a more detailed description...'}
                 </div>
