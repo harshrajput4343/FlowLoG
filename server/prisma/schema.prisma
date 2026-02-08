@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String?
+  avatarUrl    String?
+  ownedBoards  Board[]       @relation("BoardOwner")
+  boardMembers BoardMember[]
+  cardMembers  CardMember[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Board {
+  id         Int           @id @default(autoincrement())
+  title      String
+  background String?
+  ownerId    Int
+  owner      User          @relation("BoardOwner", fields: [ownerId], references: [id])
+  lists      List[]
+  labels     Label[]
+  members    BoardMember[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model BoardMember {
+  id      Int   @id @default(autoincrement())
+  boardId Int
+  userId  Int
+  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([boardId, userId])
+}
+
+model Label {
+  id      Int         @id @default(autoincrement())
+  name    String?
+  color   String
+  boardId Int
+  board   Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards   CardLabel[]
+}
+
+model List {
+  id        Int      @id @default(autoincrement())
+  title     String
+  order     Int      @default(0)
+  boardId   Int
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards     Card[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Card {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?      @db.Text
+  order       Int          @default(0)
+  dueDate     DateTime?
+  listId      Int
+  list        List         @relation(fields: [listId], references: [id], onDelete: Cascade)
+  labels      CardLabel[]
+  members     CardMember[]
+  checklists  Checklist[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model CardLabel {
+  id      Int   @id @default(autoincrement())
+  cardId  Int
+  labelId Int
+  card    Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  label   Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, labelId])
+}
+
+model CardMember {
+  id     Int  @id @default(autoincrement())
+  cardId Int
+  userId Int
+  card   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, userId])
+}
+
+model Checklist {
+  id     Int             @id @default(autoincrement())
+  title  String
+  cardId Int
+  card   Card            @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  items  ChecklistItem[]
+}
+
+model ChecklistItem {
+  id          Int       @id @default(autoincrement())
+  content     String
+  isChecked   Boolean   @default(false)
+  checklistId Int
+  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+}

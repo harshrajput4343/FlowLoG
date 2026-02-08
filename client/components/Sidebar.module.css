@@ -1,0 +1,182 @@
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.navSection {
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.navItem:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.navItem.active {
+  background: var(--active-bg);
+  color: var(--accent-blue);
+}
+
+.sectionDivider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 8px;
+  margin-top: 8px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.workspaceItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.workspaceItem:hover {
+  background: var(--hover-bg);
+}
+
+.workspaceLogo {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #00c2e0 0%, #0079bf 100%);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.workspaceName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.workspaceSubItems {
+  padding: 4px 0;
+}
+
+.workspaceSubItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 16px 6px 52px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.workspaceSubItem:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.activeSub {
+  background: var(--active-bg);
+  color: var(--accent-blue);
+}
+
+.addBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 18px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.workspaceSubItem:hover .addBtn {
+  opacity: 1;
+}
+
+.addBtn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.upgradeBanner {
+  margin: auto 12px 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(87, 157, 255, 0.1) 0%, rgba(0, 121, 191, 0.1) 100%);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.upgradeTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.upgradeDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.upgradeIcon {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  font-size: 24px;
+}

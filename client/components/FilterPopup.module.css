@@ -1,0 +1,133 @@
+.popup {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 304px;
+  background: #282e33;
+  border-radius: 3px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #b6c2cf;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #9fadbc;
+  margin: 0;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: none;
+  border: none;
+  color: #9fadbc;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+}
+
+.content {
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9fadbc;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+.option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #9fadbc;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox.checked {
+  background: #579dff;
+  border-color: #579dff;
+  color: #1d2125;
+}
+
+.labelColor {
+  width: 100%;
+  height: 32px;
+  border-radius: 3px;
+  transition: filter 0.1s;
+}
+
+.option:hover .labelColor {
+  filter: brightness(0.9);
+}
+
+.memberAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #454f59;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #b6c2cf;
+}
+
+.memberName {
+  font-size: 14px;
+  color: #b6c2cf;
+}
+
+.clearBtn {
+  width: 100%;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: #9fadbc;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.clearBtn:hover {
+  color: #b6c2cf;
+}

@@ -1,0 +1,305 @@
+.layoutContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.contentContainer {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+  background-color: var(--body-bg);
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.inviteBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0c66e4;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.inviteBtn:hover {
+  background: #0055cc;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.tab {
+  background: none;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.activeTab {
+  background: #e9f2ff;
+  color: #0c66e4;
+}
+
+[data-theme="dark"] .activeTab {
+  background: rgba(87, 157, 255, 0.16);
+  color: #579dff;
+}
+
+/* Members Content */
+.membersContent {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 32px;
+}
+
+.leftPanel {
+  flex: 1;
+  max-width: 600px;
+}
+
+.rightPanel {
+  width: 200px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.inviteTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.inviteDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+/* Invite Form */
+.inviteForm {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.emailInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.emailInput:focus {
+  border-color: #0c66e4;
+  outline: none;
+}
+
+.sendBtn {
+  background: #0c66e4;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.sendBtn:hover {
+  background: #0055cc;
+}
+
+.sendBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Message */
+.message {
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.success {
+  background: #e3fcef;
+  color: #006644;
+  border: 1px solid #00875a;
+}
+
+.error {
+  background: #ffebe6;
+  color: #bf2600;
+  border: 1px solid #ff5630;
+}
+
+[data-theme="dark"] .success {
+  background: rgba(0, 135, 90, 0.2);
+  color: #57d9a3;
+}
+
+[data-theme="dark"] .error {
+  background: rgba(255, 86, 48, 0.2);
+  color: #ff8f73;
+}
+
+/* Pending Section */
+.pendingSection {
+  margin-top: 24px;
+}
+
+.pendingTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.pendingItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--hover-bg);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.pendingEmail {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.pendingStatus {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  background: rgba(255, 171, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.pendingActions {
+  display: flex;
+  gap: 8px;
+}
+
+.resendBtn,
+.cancelBtn {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-secondary);
+}
+
+.resendBtn:hover {
+  background: #0c66e4;
+  color: white;
+}
+
+.cancelBtn:hover {
+  background: #ff5630;
+  color: white;
+}
+
+/* Invite Link Button */
+.inviteLinkBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.inviteLinkBtn:hover {
+  background: var(--hover-bg);
+}
+
+/* Members List */
+.membersList {
+  margin-top: 24px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}

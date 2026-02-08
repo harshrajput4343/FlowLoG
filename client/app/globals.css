@@ -1,0 +1,95 @@
+/* Dark Theme (default) */
+:root,
+[data-theme="dark"] {
+  --board-bg: #1d2125;
+  --list-bg: #101204;
+  --card-bg: #22272b;
+  --header-bg: #1d2125;
+  --sidebar-bg: #1d2125;
+  --text-primary: #b6c2cf;
+  --text-secondary: #9fadbc;
+  --accent-color: #579dff;
+  --accent-green: #579dff;
+  --accent-blue: #579dff;
+  --surface-overlay: #282e33;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --hover-bg: rgba(255, 255, 255, 0.08);
+  --active-bg: rgba(87, 157, 255, 0.16);
+  --modal-bg: #282e33;
+  --input-bg: #22272b;
+  --input-border: #738496;
+  --dropdown-bg: #282e33;
+  --scrollbar-track: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --body-bg: #1d2125;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --board-bg: #f1f2f4;
+  --list-bg: #ffffff;
+  --card-bg: #ffffff;
+  --header-bg: #ffffff;
+  --sidebar-bg: #f7f8f9;
+  --text-primary: #172b4d;
+  --text-secondary: #5e6c84;
+  --accent-color: #0c66e4;
+  --accent-green: #0c66e4;
+  --accent-blue: #0c66e4;
+  --surface-overlay: #ffffff;
+  --border-color: rgba(9, 30, 66, 0.13);
+  --hover-bg: rgba(9, 30, 66, 0.04);
+  --active-bg: rgba(9, 30, 66, 0.08);
+  --modal-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #dfe1e6;
+  --dropdown-bg: #ffffff;
+  --scrollbar-track: rgba(9, 30, 66, 0.08);
+  --scrollbar-thumb: rgba(9, 30, 66, 0.13);
+  --body-bg: #f1f2f4;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--body-bg);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb);
+  opacity: 0.8;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

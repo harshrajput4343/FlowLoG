@@ -1,0 +1,268 @@
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  background-image: var(--board-bg);
+}
+
+.mainHeader {
+  height: 48px;
+  background: var(--header-bg);
+  flex-shrink: 0;
+}
+
+.boardCanvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.boardTitleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(4px);
+  color: white;
+}
+
+.boardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  margin-right: 16px;
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.workspaceSelector {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 3px;
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: auto;
+  cursor: pointer;
+}
+
+.boardActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.boardActionBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 3px;
+  color: white;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.boardActionBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.boardActionBtn.active {
+  background: #e9f2ff;
+  color: #0c66e4;
+}
+
+.boardActionBtn.activeFilter {
+  background: #fff;
+  color: #0c66e4;
+}
+
+.memberAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dfe1e6;
+  color: #172b4d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  border: 2px solid transparent;
+}
+
+.shareBtn {
+  background: #dfe1e6;
+  color: #172b4d;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.shareBtn:hover {
+  background: #c1c7d0;
+}
+
+.moreBtn {
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  color: white;
+  font-size: 18px;
+  margin-left: 4px;
+}
+
+/* Lists Container */
+.listsContainer {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 12px;
+  gap: 12px;
+}
+
+/* Scrollbars for horizontal lists */
+.listsContainer::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.listsContainer::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  margin: 0 12px;
+}
+
+.listsContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+}
+
+/* Add List */
+.addListWrapper {
+  min-width: 272px;
+}
+
+.addListBtn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.24);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.addListBtn:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.addListForm {
+  background: var(--list-bg);
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.addListForm input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid var(--input-border);
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 8px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.addListForm input:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+.addListActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.addListActions button:first-child {
+  background: var(--accent-color);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.addListActions button:last-child {
+  background: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  padding: 0 8px;
+}
+
+/* Bottom Nav */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  z-index: 1000;
+}
+
+.navTab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  height: 40px;
+}
+
+.navTab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.navTab.active {
+  color: #579dff;
+}
+
+.navIcon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
