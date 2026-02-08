@@ -167,18 +167,22 @@
 
 .labelChip {
   height: 32px;
-  min-width: 48px;
-  border-radius: 3px;
+  min-width: 56px;
+  border-radius: 4px;
   padding: 0 12px;
   display: flex;
   align-items: center;
-  font-weight: 600;
-  color: #1d2125;
+  font-weight: 500;
+  font-size: 14px;
+  color: #ffffff;
   cursor: pointer;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease, filter 0.1s ease;
 }
 
 .labelChip:hover {
-  filter: brightness(0.9);
+  filter: brightness(1.1);
+  transform: scale(1.02);
 }
 
 /* Description Section */
@@ -343,4 +347,200 @@
 
 .sidebarBtn:hover {
   background: #596773;
+}
+/* Popup Menu Styles */
+.popupMenu {
+  position: absolute;
+  top: 40px;
+  background: #282e33;
+  z-index: 100;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+  width: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.popupHeader {
+  font-size: 14px;
+  font-weight: 600;
+  color: #b6c2cf;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.popupItem {
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+
+.popupItem:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.popupAvatar {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.labelColor {
+  width: 100%;
+  height: 28px;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.popupDivider {
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 12px 0;
+}
+
+.createLabelBtn {
+  background: transparent;
+  border: none;
+  color: #579dff;
+  padding: 8px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.createLabelBtn:hover {
+  background: rgba(87, 157, 255, 0.1);
+}
+
+.createLabelForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.labelInput {
+  background: #22272b;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #b6c2cf;
+  font-size: 14px;
+}
+
+.labelInput:focus {
+  border-color: #579dff;
+  outline: none;
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.colorOption {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s;
+}
+
+.colorOption:hover {
+  transform: scale(1.1);
+}
+
+.colorSelected {
+  border-color: white;
+  box-shadow: 0 0 0 2px rgba(87, 157, 255, 0.5);
+}
+
+.createLabelActions {
+  display: flex;
+  gap: 8px;
+}
+
+.createBtn {
+  background: #579dff;
+  color: #1d2125;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.createBtn:hover {
+  background: #85b8ff;
+}
+
+.cancelBtn {
+  background: #454f59;
+  color: #b6c2cf;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #596773;
+}
+
+/* Sidebar Input Boxes */
+.sidebarInputBox {
+  background: #22272b;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebarInput {
+  background: #282e33;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 8px;
+  color: #b6c2cf;
+  font-size: 14px;
+}
+
+.sidebarInput:focus {
+  border-color: #579dff;
+  outline: none;
+}
+
+.sidebarInputActions {
+  display: flex;
+  gap: 8px;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: #9fadbc;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  color: #ff5630;
 }

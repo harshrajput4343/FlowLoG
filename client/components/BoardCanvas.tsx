@@ -370,6 +370,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
       {selectedCard && (
         <CardDetailModal
           card={selectedCard}
+          boardId={board.id}
           boardLabels={board.labels || []}
           boardMembers={board.members || []}
           onClose={() => setSelectedCard(null)}

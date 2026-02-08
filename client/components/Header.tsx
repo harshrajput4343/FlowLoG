@@ -1,19 +1,82 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ProfileDropdown } from './ProfileDropdown';
 import { CreateBoardModal } from './CreateBoardModal';
 import { NotificationPopup } from './NotificationPopup';
+import { apiClient } from '@/utils/api';
 import styles from './Header.module.css';
+
+interface Board {
+  id: number;
+  title: string;
+  background?: string;
+}
 
 interface Props {
   onSearch?: (query: string) => void;
 }
 
 export const Header = ({ onSearch }: Props) => {
+  const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Board[]>([]);
+  const [allBoards, setAllBoards] = useState<Board[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Fetch all boards on mount
+  useEffect(() => {
+    const fetchBoards = async () => {
+      try {
+        const boards = await apiClient.getBoards();
+        setAllBoards(boards);
+      } catch (err) {
+        console.error('Failed to fetch boards:', err);
+      }
+    };
+    fetchBoards();
+  }, []);
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter boards when search query changes
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = allBoards.filter(board =>
+        board.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setSearchResults(filtered);
+      setShowSearchResults(true);
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  }, [searchQuery, allBoards]);
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    onSearch?.(value);
+  };
+
+  const handleBoardClick = (boardId: number) => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+    router.push(`/board/${boardId}`);
+  };
 
   return (
     <>
@@ -24,12 +87,12 @@ export const Header = ({ onSearch }: Props) => {
               src="/flowlog-logo.png"
               alt="FlowLog"
               className={styles.logoIcon}
-              style={{ height: '28px', width: 'auto' }}
+              style={{ height: '36px', width: 'auto' }}
             />
           </Link>
         </div>
 
-        <div className={styles.headerCenter}>
+        <div className={styles.headerCenter} ref={searchRef}>
           <div className={styles.headerSearch}>
             <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
@@ -37,10 +100,44 @@ export const Header = ({ onSearch }: Props) => {
             </svg>
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search boards..."
               className={styles.headerSearchInput}
-              onChange={(e) => onSearch?.(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchResults(true)}
             />
+
+            {/* Search Results Dropdown */}
+            {showSearchResults && (
+              <div className={styles.searchDropdown}>
+                {searchResults.length > 0 ? (
+                  <>
+                    <div className={styles.searchDropdownHeader}>Boards</div>
+                    {searchResults.map(board => (
+                      <div
+                        key={board.id}
+                        className={styles.searchResultItem}
+                        onClick={() => handleBoardClick(board.id)}
+                      >
+                        <div
+                          className={styles.searchResultIcon}
+                          style={{
+                            background: board.background?.startsWith('#')
+                              ? board.background
+                              : 'linear-gradient(135deg, #0079bf 0%, #5067c5 100%)'
+                          }}
+                        />
+                        <span>{board.title}</span>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className={styles.noResults}>
+                    No boards found matching "{searchQuery}"
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

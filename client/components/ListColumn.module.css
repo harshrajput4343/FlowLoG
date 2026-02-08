@@ -1,11 +1,12 @@
 .container {
   width: 272px;
-  background-color: var(--list-bg);
+  background-color: #f1f2f4;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   max-height: 100%;
-  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
 }
 
 .container.purple {
