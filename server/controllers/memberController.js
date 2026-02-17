@@ -54,3 +54,21 @@ exports.getUsers = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.createUser = async (req, res) => {
+  const { name, email } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required' });
+  }
+  try {
+    const user = await prisma.user.create({
+      data: { name, email }
+    });
+    res.status(201).json(user);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'A user with this email already exists' });
+    }
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -1,8 +1,8 @@
-# Deploying Trello Clone to Vercel (Frontend) and Render (Backend)
+# Deploying FlowLoG to Vercel (Frontend) and Render (Backend)
 
-## ✅ YES, MySQL works perfectly with this setup!
+## ✅ PostgreSQL via Supabase
 
-Your app uses Prisma with MySQL, which is fully compatible with both Vercel and Render.
+This app uses Prisma with PostgreSQL (Supabase), fully compatible with both Vercel and Render.
 
 ---
 
@@ -11,32 +11,26 @@ Your app uses Prisma with MySQL, which is fully compatible with both Vercel and 
 1. **GitHub Account** - Push your code to GitHub
 2. **Vercel Account** - Sign up at [vercel.com](https://vercel.com)
 3. **Render Account** - Sign up at [render.com](https://render.com)
-4. **MySQL Database** - You can use:
-   - [PlanetScale](https://planetscale.com) (Free tier available, MySQL-compatible)
-   - [Railway](https://railway.app) (MySQL hosting)
-   - [Render PostgreSQL](https://render.com) (Or switch to PostgreSQL)
-   - Any MySQL hosting service
+4. **Supabase Account** - Sign up at [supabase.com](https://supabase.com) (PostgreSQL database)
 
 ---
 
-## Step 1: Set Up MySQL Database
+## Step 1: Set Up Supabase PostgreSQL Database
 
-### Option A: Using PlanetScale (Recommended for MySQL)
-1. Go to [planetscale.com](https://planetscale.com) and create an account
-2. Create a new database
-3. Get your connection string (format: `mysql://username:password@host/database?sslaccept=strict`)
+1. Go to [supabase.com](https://supabase.com) and create an account
+2. Create a new project and set a database password
+3. Go to **Project Settings → Database**
+4. Copy the two connection strings:
+   - **Connection string (pooled)** → use as `DATABASE_URL`
+     ```
+     postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true
+     ```
+   - **Connection string (direct)** → use as `DIRECT_URL`
+     ```
+     postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
+     ```
 
-### Option B: Using Render PostgreSQL (Alternative)
-1. If you prefer PostgreSQL, update `server/prisma/schema.prisma`:
-   ```prisma
-   datasource db {
-     provider = "postgresql"  // Change from "mysql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-2. Update dependencies in `server/package.json`:
-   - Remove `mysql2` from dependencies (it's already there)
-   - Keep `pg` (it's already there)
+> **Why two URLs?** `DATABASE_URL` uses Supabase's connection pooler (port 6543) for runtime queries. `DIRECT_URL` uses a direct connection (port 5432) needed for Prisma migrations.
 
 ---
 
@@ -50,7 +44,7 @@ Your app uses Prisma with MySQL, which is fully compatible with both Vercel and 
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
    - Configure:
-     - **Name**: `trello-clone-backend` (or your choice)
+     - **Name**: `flowlog-backend` (or your choice)
      - **Root Directory**: `server`
      - **Environment**: `Node`
      - **Build Command**: `npm install && npm run build`
@@ -61,14 +55,15 @@ Your app uses Prisma with MySQL, which is fully compatible with both Vercel and 
    - Click "Environment" tab
    - Add these variables:
      ```
-     DATABASE_URL=your_mysql_connection_string
-     PORT=5000
+     DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true
+     DIRECT_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres
+     PORT=3001
      NODE_ENV=production
      CLIENT_URL=https://your-app.vercel.app
      ```
 
 5. **Deploy** - Render will automatically build and deploy
-6. **Copy your backend URL** (e.g., `https://trello-clone-backend.onrender.com`)
+6. **Copy your backend URL** (e.g., `https://flowlog-backend.onrender.com`)
 
 > ⚠️ **Note**: Free Render services spin down after inactivity. First request may take 50+ seconds.
 
@@ -96,7 +91,7 @@ Your app uses Prisma with MySQL, which is fully compatible with both Vercel and 
 
 4. **Deploy** - Vercel will build and deploy automatically
 
-5. **Copy your frontend URL** (e.g., `https://trello-clone.vercel.app`)
+5. **Copy your frontend URL** (e.g., `https://flowlog.vercel.app`)
 
 ---
 
@@ -115,7 +110,7 @@ After getting your Vercel URL, go back to Render and update the `CLIENT_URL` env
 Check your `client/utils/api.ts` file. It should use the environment variable:
 
 ```typescript
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 ```
 
 ---
@@ -124,7 +119,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 Your Prisma migrations will run automatically during deployment thanks to the build script:
 ```json
-"build": "prisma generate && prisma migrate deploy"
+"build": "npx prisma generate && npx prisma migrate deploy"
+```
+
+The `DIRECT_URL` in your schema ensures migrations bypass the connection pooler:
+```prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 ```
 
 If you need to run migrations manually on Render:
@@ -137,21 +141,21 @@ If you need to run migrations manually on Render:
 
 ### Backend Issues:
 - Check Render logs: Dashboard → Logs
-- Verify DATABASE_URL is correct
-- Ensure MySQL database is accessible
+- Verify `DATABASE_URL` and `DIRECT_URL` are correct
+- Ensure Supabase project is active (pauses after inactivity on free tier)
 
 ### Frontend Issues:
 - Check Vercel deployment logs
-- Verify NEXT_PUBLIC_API_URL is set correctly
+- Verify `NEXT_PUBLIC_API_URL` is set correctly
 - Check browser console for errors
 
 ### Database Connection:
-- Ensure your MySQL provider allows external connections
-- For PlanetScale, use SSL connection string
-- Test connection locally first with the production DATABASE_URL
+- Ensure `DATABASE_URL` uses port `6543` (pooled) and `DIRECT_URL` uses port `5432` (direct)
+- Check that your Supabase project is not paused
+- Test connection locally first with the production connection strings
 
 ### CORS Errors:
-- Verify CLIENT_URL matches your Vercel URL exactly
+- Verify `CLIENT_URL` matches your Vercel URL exactly
 - Check if CORS is properly configured in `server/index.js`
 
 ---
@@ -161,12 +165,13 @@ If you need to run migrations manually on Render:
 1. **Free Tier Limitations:**
    - Render: Services sleep after 15 min of inactivity (50s cold start)
    - Vercel: 100GB bandwidth/month on free tier
-   - PlanetScale: 5GB storage on free tier
+   - Supabase: 500MB database storage, project pauses after 1 week of inactivity on free tier
 
 2. **Environment Variables:**
    - Never commit `.env` files to Git
    - Use `.env.example` as a template
    - Set all variables in Render and Vercel dashboards
+   - Both `DATABASE_URL` and `DIRECT_URL` are required for Supabase + Prisma
 
 3. **Custom Domains:**
    - Both Vercel and Render support custom domains
@@ -180,12 +185,13 @@ If you need to run migrations manually on Render:
 
 ## Quick Checklist
 
-- [ ] MySQL database created and accessible
+- [ ] Supabase PostgreSQL project created
+- [ ] `DATABASE_URL` (pooled) and `DIRECT_URL` (direct) obtained
 - [ ] Code pushed to GitHub
 - [ ] Backend deployed to Render
-- [ ] Environment variables set on Render
+- [ ] Environment variables set on Render (DATABASE_URL, DIRECT_URL, PORT, CLIENT_URL)
 - [ ] Frontend deployed to Vercel
-- [ ] Environment variables set on Vercel
+- [ ] Environment variables set on Vercel (NEXT_PUBLIC_API_URL)
 - [ ] CORS settings updated with correct URLs
 - [ ] Test the application end-to-end
 
@@ -193,7 +199,8 @@ If you need to run migrations manually on Render:
 
 ## Need Help?
 
+- [Supabase Documentation](https://supabase.com/docs)
+- [Prisma + Supabase Guide](https://www.prisma.io/docs/guides/database/supabase)
 - [Render Documentation](https://render.com/docs)
 - [Vercel Documentation](https://vercel.com/docs)
 - [Prisma Documentation](https://www.prisma.io/docs)
-- [PlanetScale Documentation](https://planetscale.com/docs)

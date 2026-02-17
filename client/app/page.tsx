@@ -20,7 +20,7 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
-    apiClient.getBoards().then(setBoards).catch(console.error);
+    apiClient.getBoards().then(data => setBoards(Array.isArray(data) ? data : [])).catch(() => setBoards([]));
 
     // Load recent boards from localStorage
     const recent = JSON.parse(localStorage.getItem('recentBoards') || '[]');
@@ -28,7 +28,7 @@ export default function Dashboard() {
   }, []);
 
   const handleBoardCreated = () => {
-    apiClient.getBoards().then(setBoards).catch(console.error);
+    apiClient.getBoards().then(data => setBoards(Array.isArray(data) ? data : [])).catch(() => setBoards([]));
     setShowCreateModal(false);
   };
 

@@ -61,11 +61,11 @@ async function main() {
     ],
   });
 
-  // Create Labels
+  // Create Labels (3 predefined + extras)
   const labels = await Promise.all([
-    prisma.label.create({ data: { name: 'Bug', color: '#eb5a46', boardId: board.id } }),
-    prisma.label.create({ data: { name: 'Feature', color: '#61bd4f', boardId: board.id } }),
-    prisma.label.create({ data: { name: 'High Priority', color: '#f2d600', boardId: board.id } }),
+    prisma.label.create({ data: { name: 'Urgent', color: '#eb5a46', boardId: board.id } }),
+    prisma.label.create({ data: { name: 'Required', color: '#f2d600', boardId: board.id } }),
+    prisma.label.create({ data: { name: 'Not Urgent', color: '#61bd4f', boardId: board.id } }),
     prisma.label.create({ data: { name: 'Design', color: '#c377e0', boardId: board.id } }),
     prisma.label.create({ data: { name: 'Backend', color: '#0079bf', boardId: board.id } }),
     prisma.label.create({ data: { name: 'Frontend', color: '#00c2e0', boardId: board.id } }),

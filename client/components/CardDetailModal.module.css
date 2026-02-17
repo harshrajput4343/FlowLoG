@@ -22,7 +22,6 @@
   display: flex;
   flex-direction: column;
   padding: 16px 24px 24px 16px;
-  /* Added left padding for icons */
   color: #ffffff;
 }
 
@@ -235,19 +234,37 @@
   padding-left: 40px;
 }
 
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.progressPercent {
+  font-size: 11px;
+  color: #9fadbc;
+  min-width: 28px;
+  text-align: right;
+}
+
 .progressBar {
   height: 8px;
   background: #454f59;
   border-radius: 4px;
-  margin: 12px 0;
   overflow: hidden;
   position: relative;
+  flex: 1;
 }
 
 .progressFill {
   background: #579dff;
   height: 100%;
-  transition: width 0.2s;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.progressFill.progressComplete {
+  background: #61bd4f;
 }
 
 .percent {
@@ -262,42 +279,47 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 6px 0;
+  padding: 6px 8px;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.1s;
 }
 
 .checklistItem:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .checkbox {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border: 2px solid #9fadbc;
-  border-radius: 2px;
-  margin-top: 3px;
+  border-radius: 3px;
+  margin-top: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.15s ease;
 }
 
 .checkbox.checked {
-  background: #579dff;
-  border-color: #579dff;
-  color: #1d2125;
+  background: #61bd4f;
+  border-color: #61bd4f;
+  color: #ffffff;
 }
 
 .itemText {
   flex: 1;
   font-size: 14px;
-  line-height: 20px;
+  line-height: 22px;
+  transition: color 0.15s, text-decoration 0.15s;
 }
 
 .itemText.checked {
   text-decoration: line-through;
-  color: #9fadbc;
+  color: #6b778c;
 }
 
 .addItemBtn {
@@ -313,6 +335,32 @@
 
 .addItemBtn:hover {
   background: #596773;
+}
+
+.addItemForm {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addItemInput {
+  background: #22272b;
+  border: 1px solid #579dff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #b6c2cf;
+  font-size: 14px;
+  outline: none;
+}
+
+.addItemInput:focus {
+  border-color: #85b8ff;
+}
+
+.addItemActions {
+  display: flex;
+  gap: 8px;
 }
 
 /* Sidebar Actions */
@@ -348,6 +396,7 @@
 .sidebarBtn:hover {
   background: #596773;
 }
+
 /* Popup Menu Styles */
 .popupMenu {
   position: absolute;
@@ -356,7 +405,7 @@
   z-index: 100;
   padding: 12px;
   border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
   width: 280px;
   max-height: 400px;
   overflow-y: auto;
@@ -368,7 +417,7 @@
   color: #b6c2cf;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .popupItem {
@@ -382,7 +431,7 @@
 }
 
 .popupItem:hover {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .popupAvatar {
@@ -407,7 +456,7 @@
 
 .popupDivider {
   height: 1px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   margin: 12px 0;
 }
 
@@ -435,7 +484,7 @@
 
 .labelInput {
   background: #22272b;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   padding: 8px 12px;
   color: #b6c2cf;
@@ -515,7 +564,7 @@
 
 .sidebarInput {
   background: #282e33;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   padding: 8px;
   color: #b6c2cf;
@@ -545,9 +594,9 @@
   color: #ff5630;
 }
 
-
 /* Label Edit/Delete Buttons */
-.editLabelBtn, .deleteLabelBtn {
+.editLabelBtn,
+.deleteLabelBtn {
   background: transparent;
   border: none;
   padding: 4px;
@@ -557,7 +606,8 @@
   font-size: 12px;
 }
 
-.editLabelBtn:hover, .deleteLabelBtn:hover {
+.editLabelBtn:hover,
+.deleteLabelBtn:hover {
   opacity: 1;
 }
 
@@ -574,7 +624,7 @@
   color: white;
   font-weight: 600;
   font-size: 14px;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .descPlaceholder {

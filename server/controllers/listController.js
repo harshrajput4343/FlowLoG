@@ -52,11 +52,14 @@ exports.deleteList = async (req, res) => {
 
 exports.updateList = async (req, res) => {
   const { id } = req.params;
-  const { title } = req.body;
+  const { title, color } = req.body;
   try {
+    const data = {};
+    if (title !== undefined) data.title = title;
+    if (color !== undefined) data.color = color;
     const list = await prisma.list.update({
       where: { id: parseInt(id) },
-      data: { title }
+      data
     });
     res.json(list);
   } catch (error) {

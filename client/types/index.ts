@@ -40,6 +40,7 @@ export interface ChecklistItem {
 export interface List {
   id: number;
   title: string;
+  color?: string;
   order: number;
   boardId: number;
   cards: Card[];

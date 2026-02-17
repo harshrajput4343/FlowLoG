@@ -35,16 +35,22 @@
   transform: scale(1.02);
 }
 
-.logoIcon {
+.logoFlow {
+  font-family: var(--font-poppins), 'Poppins', sans-serif;
+  font-weight: 700;
   font-size: 24px;
-}
-
-.logoText {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #4f8ef7 0%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.logoLog {
+  font-family: var(--font-poppins), 'Poppins', sans-serif;
   font-weight: 800;
+  font-size: 24px;
+  color: #22c55e;
   letter-spacing: -0.5px;
 }
 

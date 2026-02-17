@@ -9,11 +9,6 @@
   border: none;
 }
 
-.container.purple {
-  background-color: #f1f2f4;
-  border-left: 1px solid rgba(0, 0, 0, 0.1);
-}
-
 .header {
   padding: 8px 8px 4px 12px;
   display: flex;
@@ -22,50 +17,8 @@
   cursor: grab;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+  transition: background-color 0.2s ease;
 }
-
-.header.purple {
-  background: #6E5DC6;
-  color: white;
-  margin: -1px -1px 0 -1px;
-}
-
-.header.purple .title {
-  color: white;
-}
-
-.header.green {
-  background: #216E4E;
-  color: white;
-  margin: -1px -1px 0 -1px;
-}
-
-.header.green .title {
-  color: white;
-}
-
-.header.yellow {
-  background-color: #F5CD47;
-  color: #172b4d;
-  margin: -1px -1px 0 -1px;
-}
-
-.header.yellow .title {
-  color: #172b4d;
-}
-
-.header.yellow .actionBtn {
-  color: #172b4d;
-}
-
-.header.yellow .menu {
-  color: #172b4d;
-}
-
-.header.dark {
-  background: #1F262C;
-}
-
 
 .title {
   font-weight: 600;
@@ -146,7 +99,7 @@
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   z-index: 100;
-  min-width: 160px;
+  min-width: 200px;
   padding: 4px 0;
 }
 
@@ -168,6 +121,43 @@
 
 .deleteBtn {
   color: #ff5630 !important;
+}
+
+/* Color Picker in Dropdown */
+.colorPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.colorSwatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.colorSwatchActive {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(87, 157, 255, 0.5);
+}
+
+.removeColorBtn {
+  grid-column: 1 / -1;
+  text-align: center !important;
+  font-size: 12px !important;
+  color: #9fadbc !important;
+  padding: 4px 8px !important;
+  border-radius: 3px;
+  margin-top: 4px;
 }
 
 .cardList {

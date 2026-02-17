@@ -83,8 +83,8 @@ export const Header = ({ onSearch }: Props) => {
       <header className={styles.mainHeader}>
         <div className={styles.headerLeft}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoIcon}>📋</span>
-            <span className={styles.logoText}>FlowLoG</span>
+            <span className={styles.logoFlow}>Flow</span>
+            <span className={styles.logoLog}>LoG</span>
           </Link>
         </div>
 

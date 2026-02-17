@@ -55,6 +55,7 @@ model Label {
 model List {
   id        Int      @id @default(autoincrement())
   title     String
+  color     String?
   order     Int      @default(0)
   boardId   Int
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)

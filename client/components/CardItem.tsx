@@ -63,8 +63,12 @@ export const CardItem = ({ card, index, onClick }: Props) => {
                   </div>
                 )}
                 {totalChecks > 0 && (
-                  <div className={styles.metaItem} title="Checklist items">
-                    ☑ {completedChecks}/{totalChecks}
+                  <div
+                    className={styles.metaItem}
+                    title="Checklist items"
+                    style={completedChecks === totalChecks ? { color: '#61bd4f', fontWeight: 600 } : undefined}
+                  >
+                    {completedChecks === totalChecks ? '✅' : '☑'} {completedChecks}/{totalChecks}
                   </div>
                 )}
                 {card.members && card.members.length > 0 && (

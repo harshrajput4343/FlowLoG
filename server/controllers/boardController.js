@@ -91,6 +91,16 @@ exports.createBoard = async (req, res) => {
         ownerId: ownerId || 1 // Default to user 1 if not provided
       }
     });
+
+    // Create predefined labels for the new board
+    await prisma.label.createMany({
+      data: [
+        { name: 'Urgent', color: '#eb5a46', boardId: newBoard.id },
+        { name: 'Required', color: '#f2d600', boardId: newBoard.id },
+        { name: 'Not Urgent', color: '#61bd4f', boardId: newBoard.id },
+      ]
+    });
+
     res.status(201).json(newBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -87,6 +87,17 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     });
   };
 
+  const handleUpdateListColor = async (listId: number, color: string | null) => {
+    await apiClient.updateListColor(listId, color);
+    const updatedLists = board.lists.map(list => {
+      if (list.id === listId) {
+        return { ...list, color: color || undefined };
+      }
+      return list;
+    });
+    setBoard({ ...board, lists: updatedLists });
+  };
+
   const handleCardClick = (card: Card) => {
     setSelectedCard(card);
   };
@@ -290,6 +301,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
                     onAddCard={handleAddCard}
                     onUpdateList={handleUpdateList}
                     onDeleteList={handleDeleteList}
+                    onUpdateListColor={handleUpdateListColor}
                     onCardClick={handleCardClick}
                   />
                 ))}

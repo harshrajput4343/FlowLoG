@@ -51,6 +51,15 @@ export const CardDetailModal = ({
   const [newChecklistTitle, setNewChecklistTitle] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dueDate, setDueDate] = useState(card.dueDate || '');
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [addingItemToChecklist, setAddingItemToChecklist] = useState<number | null>(null);
+  const [newItemContent, setNewItemContent] = useState('');
+
+  // New member creation state
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [memberError, setMemberError] = useState('');
 
   // Label editing state
   const [editingLabelId, setEditingLabelId] = useState<number | null>(null);
@@ -63,6 +72,13 @@ export const CardDetailModal = ({
   useEffect(() => {
     setLocalLabels(boardLabels);
   }, [boardLabels]);
+
+  // Fetch all users for the Members popup
+  useEffect(() => {
+    apiClient.getUsers().then(users => {
+      if (Array.isArray(users)) setAllUsers(users);
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -186,6 +202,54 @@ export const CardDetailModal = ({
     }
   };
 
+  const handleToggleChecklistItem = async (checklistId: number, itemId: number) => {
+    try {
+      await apiClient.toggleChecklistItem(itemId);
+      const updatedChecklists = (card.checklists || []).map(cl => {
+        if (cl.id === checklistId) {
+          return {
+            ...cl,
+            items: cl.items.map(item =>
+              item.id === itemId ? { ...item, isChecked: !item.isChecked } : item
+            )
+          };
+        }
+        return cl;
+      });
+      onUpdate({ ...card, checklists: updatedChecklists });
+    } catch (err) {
+      console.error('Failed to toggle checklist item:', err);
+    }
+  };
+
+  const handleAddChecklistItem = async (checklistId: number) => {
+    if (!newItemContent.trim()) return;
+    try {
+      const newItem = await apiClient.addChecklistItem(checklistId, newItemContent.trim());
+      const updatedChecklists = (card.checklists || []).map(cl => {
+        if (cl.id === checklistId) {
+          return { ...cl, items: [...cl.items, newItem] };
+        }
+        return cl;
+      });
+      onUpdate({ ...card, checklists: updatedChecklists });
+      setNewItemContent('');
+      setAddingItemToChecklist(null);
+    } catch (err) {
+      console.error('Failed to add checklist item:', err);
+    }
+  };
+
+  const handleDeleteChecklist = async (checklistId: number) => {
+    try {
+      await apiClient.deleteChecklist(checklistId);
+      const updatedChecklists = (card.checklists || []).filter(cl => cl.id !== checklistId);
+      onUpdate({ ...card, checklists: updatedChecklists });
+    } catch (err) {
+      console.error('Failed to delete checklist:', err);
+    }
+  };
+
   const handleSaveDueDate = async () => {
     try {
       await apiClient.updateCard(card.id, { dueDate: dueDate || null });
@@ -231,9 +295,9 @@ export const CardDetailModal = ({
                   <button className={styles.metaBtn} onClick={() => setShowMemberMenu(!showMemberMenu)}>+</button>
 
                   {showMemberMenu && (
-                    <div className={styles.popupMenu} style={{ left: '0' }}>
+                    <div className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
                       <div className={styles.popupHeader}>Members</div>
-                      {boardMembers.map(m => (
+                      {allUsers.length > 0 ? allUsers.map(m => (
                         <div
                           key={m.id}
                           className={styles.popupItem}
@@ -241,9 +305,65 @@ export const CardDetailModal = ({
                         >
                           <div className={styles.popupAvatar}>{m.name[0]}</div>
                           <span style={{ flex: 1 }}>{m.name}</span>
-                          {card.members.some(cm => cm.id === m.id) && <span>✓</span>}
+                          {card.members.some(cm => cm.id === m.id) && <span style={{ color: '#61bd4f' }}>✓</span>}
                         </div>
-                      ))}
+                      )) : (
+                        <div style={{ color: '#9fadbc', fontSize: '13px', padding: '8px' }}>No users found</div>
+                      )}
+
+                      <div className={styles.popupDivider}></div>
+
+                      {!showAddMember ? (
+                        <button
+                          className={styles.createLabelBtn}
+                          onClick={() => { setShowAddMember(true); setMemberError(''); }}
+                        >
+                          + Add a new member
+                        </button>
+                      ) : (
+                        <div className={styles.createLabelForm}>
+                          {memberError && (
+                            <div style={{ color: '#ff5630', fontSize: '12px', padding: '0 4px' }}>{memberError}</div>
+                          )}
+                          <input
+                            type="text"
+                            placeholder="Name"
+                            value={newMemberName}
+                            onChange={e => setNewMemberName(e.target.value)}
+                            className={styles.labelInput}
+                            autoFocus
+                          />
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={newMemberEmail}
+                            onChange={e => setNewMemberEmail(e.target.value)}
+                            className={styles.labelInput}
+                          />
+                          <div className={styles.createLabelActions}>
+                            <button
+                              onClick={async () => {
+                                if (!newMemberName.trim() || !newMemberEmail.trim()) {
+                                  setMemberError('Name and email are required');
+                                  return;
+                                }
+                                try {
+                                  const newUser = await apiClient.createUser(newMemberName.trim(), newMemberEmail.trim());
+                                  setAllUsers([...allUsers, newUser]);
+                                  setNewMemberName('');
+                                  setNewMemberEmail('');
+                                  setShowAddMember(false);
+                                  setMemberError('');
+                                } catch (err: any) {
+                                  setMemberError(err.message || 'Failed to add member');
+                                }
+                              }}
+                              className={styles.createBtn}
+                            >Add</button>
+                            <button onClick={() => { setShowAddMember(false); setMemberError(''); }} className={styles.cancelBtn}>Cancel</button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -260,7 +380,7 @@ export const CardDetailModal = ({
                   <button className={styles.metaBtn} onClick={() => setShowLabelMenu(!showLabelMenu)}>+</button>
 
                   {showLabelMenu && (
-                    <div className={styles.popupMenu} style={{ left: '100px' }}>
+                    <div className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
                       <div className={styles.popupHeader}>Labels</div>
 
                       {/* Editing a label */}
@@ -398,36 +518,63 @@ export const CardDetailModal = ({
             </div>
 
             {/* Checklists */}
-            {card.checklists?.map(cl => (
-              <div key={cl.id} className={styles.checklistSection}>
-                <span className={styles.headerIcon}>☑</span>
-                <div className={styles.sectionHeader}>
-                  <h3 className={styles.sectionTitle}>{cl.title}</h3>
-                  <button className={styles.deleteBtn} onClick={() => apiClient.deleteChecklist(cl.id)}>Delete</button>
-                </div>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{ width: cl.items.length > 0 ? `${(cl.items.filter(i => i.isChecked).length / cl.items.length) * 100}%` : '0%' }}
-                  />
-                </div>
-                {cl.items.map(item => (
-                  <div
-                    key={item.id}
-                    className={styles.checklistItem}
-                    onClick={() => apiClient.toggleChecklistItem(item.id)}
-                  >
-                    <div className={`${styles.checkbox} ${item.isChecked ? styles.checked : ''}`}>
-                      {item.isChecked && '✓'}
-                    </div>
-                    <span className={`${styles.itemText} ${item.isChecked ? styles.checked : ''}`}>
-                      {item.content}
-                    </span>
+            {card.checklists?.map(cl => {
+              const checkedCount = cl.items.filter(i => i.isChecked).length;
+              const totalCount = cl.items.length;
+              const progressPercent = totalCount > 0 ? (checkedCount / totalCount) * 100 : 0;
+              const allDone = totalCount > 0 && checkedCount === totalCount;
+              return (
+                <div key={cl.id} className={styles.checklistSection}>
+                  <span className={styles.headerIcon}>📋</span>
+                  <div className={styles.sectionHeader}>
+                    <h3 className={styles.sectionTitle}>{cl.title}</h3>
+                    <button className={styles.deleteBtn} onClick={() => handleDeleteChecklist(cl.id)}>Delete</button>
                   </div>
-                ))}
-                <button className={styles.addItemBtn}>Add an item</button>
-              </div>
-            ))}
+                  <div className={styles.progressRow}>
+                    <span className={styles.progressPercent}>{Math.round(progressPercent)}%</span>
+                    <div className={styles.progressBar}>
+                      <div
+                        className={`${styles.progressFill} ${allDone ? styles.progressComplete : ''}`}
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                  {cl.items.map(item => (
+                    <div
+                      key={item.id}
+                      className={styles.checklistItem}
+                      onClick={() => handleToggleChecklistItem(cl.id, item.id)}
+                    >
+                      <div className={`${styles.checkbox} ${item.isChecked ? styles.checked : ''}`}>
+                        {item.isChecked && '✓'}
+                      </div>
+                      <span className={`${styles.itemText} ${item.isChecked ? styles.checked : ''}`}>
+                        {item.content}
+                      </span>
+                    </div>
+                  ))}
+                  {addingItemToChecklist === cl.id ? (
+                    <div className={styles.addItemForm}>
+                      <input
+                        type="text"
+                        placeholder="Add an item..."
+                        value={newItemContent}
+                        onChange={e => setNewItemContent(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleAddChecklistItem(cl.id)}
+                        className={styles.addItemInput}
+                        autoFocus
+                      />
+                      <div className={styles.addItemActions}>
+                        <button onClick={() => handleAddChecklistItem(cl.id)} className={styles.createBtn}>Add</button>
+                        <button onClick={() => { setAddingItemToChecklist(null); setNewItemContent(''); }} className={styles.cancelBtn}>Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button className={styles.addItemBtn} onClick={() => setAddingItemToChecklist(cl.id)}>Add an item</button>
+                  )}
+                </div>
+              );
+            })}
 
           </div>
 
@@ -446,8 +593,6 @@ export const CardDetailModal = ({
               <button className={styles.sidebarBtn} onClick={() => setShowDatePicker(!showDatePicker)}>
                 🕒 Dates
               </button>
-              <button className={styles.sidebarBtn}>📎 Attachment</button>
-              <button className={styles.sidebarBtn}>🖼️ Cover</button>
             </div>
 
             {/* Checklist Input */}
@@ -486,12 +631,9 @@ export const CardDetailModal = ({
 
             <div className={styles.sidebarGroup}>
               <div className={styles.groupTitle}>Actions</div>
-              <button className={styles.sidebarBtn}>➡️ Move</button>
-              <button className={styles.sidebarBtn}>📋 Copy</button>
               <button className={styles.sidebarBtn} onClick={() => { if (confirm('Delete card?')) onDelete(); }}>
                 🗑️ Delete
               </button>
-              <button className={styles.sidebarBtn}>Share</button>
             </div>
           </div>
         </div>

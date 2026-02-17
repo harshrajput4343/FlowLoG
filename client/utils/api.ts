@@ -2,9 +2,11 @@ const API_BASE = 'http://localhost:3001/api';
 
 export const apiClient = {
   // Boards
-  getBoards: async () => {
+  getBoards: async (): Promise<any[]> => {
     const res = await fetch(`${API_BASE}/boards`);
-    return res.json();
+    if (!res.ok) throw new Error('Failed to fetch boards');
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   },
   getBoard: async (id: number) => {
     const res = await fetch(`${API_BASE}/boards/${id}`);
@@ -37,6 +39,14 @@ export const apiClient = {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title })
+    });
+    return res.json();
+  },
+  updateListColor: async (id: number, color: string | null) => {
+    const res = await fetch(`${API_BASE}/lists/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ color })
     });
     return res.json();
   },
@@ -160,5 +170,17 @@ export const apiClient = {
   },
   removeMemberFromCard: async (cardId: number, userId: number) => {
     await fetch(`${API_BASE}/members/card/${cardId}/${userId}`, { method: 'DELETE' });
+  },
+  createUser: async (name: string, email: string) => {
+    const res = await fetch(`${API_BASE}/members/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to create user');
+    }
+    return res.json();
   }
 };
