@@ -10,7 +10,13 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://flowlogwork.vercel.app',
+    'https://flowlog-h7m0dco1t-harsh-kumars-projects-931d9e9f.vercel.app'
+  ]
+}));
 app.use(express.json());
 
 // Basic Route
