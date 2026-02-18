@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="client/public/flowlog-logo.png" alt="FlowLoG Logo" width="120" />
+  <img src="client/public/flowlog-logo.jpg" alt="FlowLoG Logo" width="120" />
 </p>
 
 <h1 align="center">FlowLoG</h1>
