@@ -543,7 +543,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 <p align="center">
-  <strong>Built with passion by <a href="https://github.com/harshrajput4343">Harsh Kumar</a></strong>
+  <strong>Built with passion by <a href="https://github.com/harshrajput4343">Harsh Kumar | heymyselfharsh@gmail.com</a></strong>
 </p>
 
 <p align="center">
