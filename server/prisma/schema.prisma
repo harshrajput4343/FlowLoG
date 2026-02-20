@@ -13,11 +13,11 @@ model User {
   email        String        @unique
   name         String?
   avatarUrl    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   ownedBoards  Board[]       @relation("BoardOwner")
   boardMembers BoardMember[]
   cardMembers  CardMember[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
 }
 
 model Board {
@@ -25,12 +25,12 @@ model Board {
   title      String
   background String?
   ownerId    Int
-  owner      User          @relation("BoardOwner", fields: [ownerId], references: [id])
-  lists      List[]
-  labels     Label[]
-  members    BoardMember[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+  owner      User          @relation("BoardOwner", fields: [ownerId], references: [id])
+  members    BoardMember[]
+  labels     Label[]
+  lists      List[]
 }
 
 model BoardMember {
@@ -48,20 +48,20 @@ model Label {
   name    String?
   color   String
   boardId Int
-  board   Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
   cards   CardLabel[]
+  board   Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model List {
   id        Int      @id @default(autoincrement())
   title     String
-  color     String?
   order     Int      @default(0)
   boardId   Int
-  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  cards     Card[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  color     String?
+  cards     Card[]
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model Card {
@@ -71,12 +71,12 @@ model Card {
   order       Int          @default(0)
   dueDate     DateTime?
   listId      Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   list        List         @relation(fields: [listId], references: [id], onDelete: Cascade)
   labels      CardLabel[]
   members     CardMember[]
   checklists  Checklist[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
 }
 
 model CardLabel {

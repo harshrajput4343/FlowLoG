@@ -117,4 +117,18 @@ exports.deleteBoard = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
+
+exports.updateBoard = async (req, res) => {
+  const { id } = req.params;
+  const { title, background } = req.body;
+  try {
+    const updatedBoard = await prisma.board.update({
+      where: { id: parseInt(id) },
+      data: { title, background }
+    });
+    res.json(updatedBoard);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
