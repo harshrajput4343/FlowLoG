@@ -6,5 +6,6 @@ router.get('/', boardController.getBoards);
 router.post('/', boardController.createBoard);
 router.get('/:id', boardController.getBoardById);
 router.delete('/:id', boardController.deleteBoard);
+router.put('/:id', boardController.updateBoard);
 
 module.exports = router;

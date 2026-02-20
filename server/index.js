@@ -11,13 +11,14 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://flowlogwork.vercel.app',
-    'https://flowlog-h7m0dco1t-harsh-kumars-projects-931d9e9f.vercel.app'
-  ]
+  origin: '*'
 }));
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Basic Route
 app.get('/', (req, res) => {
@@ -32,6 +33,7 @@ app.use('/api/labels', require('./routes/labels'));
 app.use('/api/checklists', require('./routes/checklists'));
 app.use('/api/members', require('./routes/members'));
 app.use('/api/invitations', require('./routes/invitations'));
+app.use('/api/auth', require('./routes/auth'));
 
 // Start Server
 app.listen(PORT, () => {

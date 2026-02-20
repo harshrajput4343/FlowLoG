@@ -173,3 +173,13 @@
   align-items: center;
   justify-content: center;
 }
+
+.logoutItem {
+  color: #f87168;
+  font-weight: 500;
+}
+
+.logoutItem:hover {
+  background: rgba(248, 113, 104, 0.1);
+  color: #f87168;
+}

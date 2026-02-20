@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import { Board, List, Card, Label, User } from '@/types';
 import { ListColumn } from './ListColumn';
@@ -14,7 +15,56 @@ interface Props {
   board: Board;
 }
 
+const BG_COLORS = [
+  '#0079bf', '#d29034', '#519839', '#b04632', '#89609e',
+  '#cd5a91', '#4bbf6b', '#00aecc', '#838c91', '#172b4d',
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+  'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+];
+
+// Dynamic Current Date widget
+const LiveDate = () => {
+  const [dateStr, setDateStr] = useState('');
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      setDateStr(now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }));
+    };
+    update();
+    const timer = setInterval(update, 60000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '60px',
+      right: '20px',
+      zIndex: 900,
+      pointerEvents: 'none',
+    }}>
+      <div style={{
+        background: 'rgba(0,0,0,0.55)',
+        backdropFilter: 'blur(6px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        padding: '5px 12px',
+        borderRadius: '20px',
+        color: 'white',
+        fontWeight: '600',
+        fontSize: '12px',
+        letterSpacing: '0.3px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        whiteSpace: 'nowrap',
+      }}>{dateStr}</div>
+    </div>
+  );
+};
+
 export const BoardCanvas = ({ board: initialBoard }: Props) => {
+  const router = useRouter();
   const [board, setBoard] = useState(initialBoard);
   const [enabled, setEnabled] = useState(false);
   const [addingList, setAddingList] = useState(false);
@@ -25,6 +75,12 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
   const [filterMember, setFilterMember] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showSwitchBoards, setShowSwitchBoards] = useState(false);
+
+  // Board dot-menu state
+  const [showBoardMenu, setShowBoardMenu] = useState(false);
+  const [showBgPanel, setShowBgPanel] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const boardMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const animation = requestAnimationFrame(() => setEnabled(true));
@@ -42,6 +98,18 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     const updated = [boardInfo, ...filtered].slice(0, 5);
     localStorage.setItem('recentBoards', JSON.stringify(updated));
   }, [board.id, board.title, board.background]);
+
+  // Close board menu / bg panel on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (boardMenuRef.current && !boardMenuRef.current.contains(e.target as Node)) {
+        setShowBoardMenu(false);
+        setShowBgPanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleAddList = async () => {
     if (!newListTitle.trim()) return;
@@ -123,17 +191,41 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     setSelectedCard(null);
   };
 
+  // Delete board handler
+  const handleDeleteBoard = async () => {
+    try {
+      await apiClient.deleteBoard(board.id);
+      // Remove from recent boards
+      const recent = JSON.parse(localStorage.getItem('recentBoards') || '[]');
+      localStorage.setItem('recentBoards', JSON.stringify(recent.filter((b: { id: number }) => b.id !== board.id)));
+      router.push('/');
+    } catch (err) {
+      console.error('Failed to delete board:', err);
+    }
+  };
+
+  // Change background handler
+  const handleChangeBg = async (bg: string) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api'}/boards/${board.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ background: bg }),
+      });
+      setBoard({ ...board, background: bg });
+    } catch (err) {
+      console.error('Failed to update background:', err);
+    }
+  };
+
   const filterCards = useCallback((cards: Card[]) => {
     return cards.filter(card => {
-      // Search filter
       if (searchQuery && !card.title.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      // Label filter
       if (filterLabel && !card.labels.some(l => l.id === filterLabel)) {
         return false;
       }
-      // Member filter
       if (filterMember && !card.members.some(m => m.id === filterMember)) {
         return false;
       }
@@ -288,7 +380,105 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
                   <button className={styles.shareBtn}>
                     👥 Share
                   </button>
-                  <button className={styles.moreBtn}>⋯</button>
+
+                  {/* 3-dot Board Menu */}
+                  <div ref={boardMenuRef} style={{ position: 'relative' }}>
+                    <button
+                      className={`${styles.moreBtn} ${showBoardMenu ? styles.moreBtnActive : ''}`}
+                      onClick={() => {
+                        setShowBoardMenu(prev => !prev);
+                        setShowBgPanel(false);
+                      }}
+                      title="Board menu"
+                    >
+                      ⋯
+                    </button>
+
+                    {showBoardMenu && !showBgPanel && (
+                      <div className={styles.boardMenu}>
+                        <div className={styles.boardMenuHeader}>Board actions</div>
+                        <button
+                          className={styles.boardMenuItem}
+                          onClick={() => {
+                            setShowBgPanel(true);
+                          }}
+                        >
+                          <span className={styles.boardMenuIcon}>🎨</span>
+                          Change Background
+                        </button>
+                        <div className={styles.boardMenuDivider} />
+                        <button
+                          className={`${styles.boardMenuItem} ${styles.boardMenuDanger}`}
+                          onClick={() => {
+                            setShowBoardMenu(false);
+                            setShowDeleteConfirm(true);
+                          }}
+                        >
+                          <span className={styles.boardMenuIcon}>🗑️</span>
+                          Delete Board
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Background Picker Panel */}
+                    {showBgPanel && (
+                      <div className={styles.bgPanel}>
+                        <div className={styles.bgPanelHeader}>
+                          <button
+                            className={styles.bgPanelBack}
+                            onClick={() => setShowBgPanel(false)}
+                          >
+                            ← Back
+                          </button>
+                          <span>Change Background</span>
+                        </div>
+
+                        <div className={styles.bgSection}>
+                          <div className={styles.bgSectionTitle}>Colors & Gradients</div>
+                          <div className={styles.bgColorGrid}>
+                            {BG_COLORS.map((bg, i) => (
+                              <button
+                                key={i}
+                                className={`${styles.bgColorSwatch} ${board.background === bg ? styles.bgColorSelected : ''}`}
+                                style={{ background: bg }}
+                                onClick={() => {
+                                  handleChangeBg(bg);
+                                  setShowBgPanel(false);
+                                  setShowBoardMenu(false);
+                                }}
+                                title={bg}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className={styles.bgSection}>
+                          <div className={styles.bgSectionTitle}>Custom Image URL</div>
+                          <div className={styles.bgImageRow}>
+                            <input
+                              type="text"
+                              placeholder="Paste image URL..."
+                              className={styles.bgImageInput}
+                              id="bg-image-url"
+                            />
+                            <button
+                              className={styles.bgImageApplyBtn}
+                              onClick={() => {
+                                const url = (document.getElementById('bg-image-url') as HTMLInputElement)?.value?.trim();
+                                if (url) {
+                                  handleChangeBg(`url(${url})`);
+                                  setShowBgPanel(false);
+                                  setShowBoardMenu(false);
+                                }
+                              }}
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -337,20 +527,8 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
         </Droppable>
       </DragDropContext>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation — Board & Switch Boards only */}
       <nav className={styles.bottomNav}>
-        <button className={styles.navTab}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z" />
-          </svg>
-          <span>Inbox</span>
-        </button>
-        <button className={styles.navTab}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
-          </svg>
-          <span>Planner</span>
-        </button>
         <button className={`${styles.navTab} ${styles.active}`}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -391,28 +569,34 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
         />
       )}
 
-      {/* Mascot 2026 */}
-      <div style={{
-        position: 'fixed',
-        bottom: '60px',
-        right: '20px',
-        zIndex: 900,
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px'
-      }}>
-        <div style={{
-          background: '#0c66e4',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          color: 'white',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-        }}>2026</div>
-        <div style={{ fontSize: '32px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>🐶</div>
-      </div>
+      {/* Delete Board Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className={styles.confirmOverlay}>
+          <div className={styles.confirmDialog}>
+            <h3 className={styles.confirmTitle}>Delete Board?</h3>
+            <p className={styles.confirmText}>
+              Are you sure you want to delete <strong>"{board.title}"</strong>? All lists and cards will be permanently removed. This action cannot be undone.
+            </p>
+            <div className={styles.confirmActions}>
+              <button
+                className={styles.confirmDeleteBtn}
+                onClick={handleDeleteBoard}
+              >
+                Delete Board
+              </button>
+              <button
+                className={styles.confirmCancelBtn}
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Live Date Widget */}
+      <LiveDate />
     </div>
   );
 };

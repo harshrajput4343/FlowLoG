@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, Label, User } from '@/types';
 import { apiClient } from '@/utils/api';
 import styles from './CardDetailModal.module.css';
@@ -68,6 +68,8 @@ export const CardDetailModal = ({
   const [localLabels, setLocalLabels] = useState(boardLabels);
 
   const modalRef = useRef<HTMLDivElement>(null);
+  const memberMenuRef = useRef<HTMLDivElement>(null);
+  const labelMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLocalLabels(boardLabels);
@@ -80,6 +82,7 @@ export const CardDetailModal = ({
     }).catch(console.error);
   }, []);
 
+  // Close modal on outside click (but not when clicking inside label/member menus)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -89,6 +92,32 @@ export const CardDetailModal = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose]);
+
+  // Close member menu on outside click
+  useEffect(() => {
+    if (!showMemberMenu) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (memberMenuRef.current && !memberMenuRef.current.contains(event.target as Node)) {
+        setShowMemberMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMemberMenu]);
+
+  // Close label menu on outside click
+  useEffect(() => {
+    if (!showLabelMenu) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (labelMenuRef.current && !labelMenuRef.current.contains(event.target as Node)) {
+        setShowLabelMenu(false);
+        setEditingLabelId(null);
+        setShowCreateLabel(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showLabelMenu]);
 
   const handleSaveTitle = () => {
     if (title !== card.title) {
@@ -292,10 +321,10 @@ export const CardDetailModal = ({
                       {m.avatarUrl ? <img src={m.avatarUrl} alt="" className={styles.memberAvatar} /> : m.name[0]}
                     </div>
                   ))}
-                  <button className={styles.metaBtn} onClick={() => setShowMemberMenu(!showMemberMenu)}>+</button>
+                  <button className={styles.metaBtn} onClick={() => setShowMemberMenu(prev => !prev)}>+</button>
 
                   {showMemberMenu && (
-                    <div className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
+                    <div ref={memberMenuRef} className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
                       <div className={styles.popupHeader}>Members</div>
                       {allUsers.length > 0 ? allUsers.map(m => (
                         <div
@@ -377,10 +406,10 @@ export const CardDetailModal = ({
                       {l.name}
                     </div>
                   ))}
-                  <button className={styles.metaBtn} onClick={() => setShowLabelMenu(!showLabelMenu)}>+</button>
+                  <button className={styles.metaBtn} onClick={() => setShowLabelMenu(prev => !prev)}>+</button>
 
                   {showLabelMenu && (
-                    <div className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
+                    <div ref={labelMenuRef} className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
                       <div className={styles.popupHeader}>Labels</div>
 
                       {/* Editing a label */}
@@ -581,10 +610,10 @@ export const CardDetailModal = ({
           <div className={styles.sidebarColumn}>
             <div className={styles.sidebarGroup}>
               <div className={styles.groupTitle}>Add to card</div>
-              <button className={styles.sidebarBtn} onClick={() => setShowMemberMenu(!showMemberMenu)}>
+              <button className={styles.sidebarBtn} onClick={() => setShowMemberMenu(prev => !prev)}>
                 👤 Members
               </button>
-              <button className={styles.sidebarBtn} onClick={() => setShowLabelMenu(!showLabelMenu)}>
+              <button className={styles.sidebarBtn} onClick={() => setShowLabelMenu(prev => !prev)}>
                 🏷️ Labels
               </button>
               <button className={styles.sidebarBtn} onClick={() => setShowChecklistInput(!showChecklistInput)}>

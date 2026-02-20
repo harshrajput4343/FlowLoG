@@ -140,7 +140,14 @@ export const Header = ({ onSearch }: Props) => {
         <div className={styles.headerRight}>
           <button
             className={styles.createBtn}
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              const token = typeof window !== 'undefined' && localStorage.getItem('authToken');
+              if (!token) {
+                router.push('/login');
+              } else {
+                setShowCreateModal(true);
+              }
+            }}
           >
             Create
           </button>

@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
 import styles from './ProfileDropdown.module.css';
 
@@ -8,6 +9,19 @@ interface Props {
 
 export const ProfileDropdown = ({ onClose }: Props) => {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Clear auth session tokens / user data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
+    // Optionally clear recent boards on logout
+    // localStorage.removeItem('recentBoards');
+    onClose();
+    // Redirect to login page
+    router.push('/login');
+  };
 
   return (
     <>
@@ -17,9 +31,9 @@ export const ProfileDropdown = ({ onClose }: Props) => {
         <div className={styles.section}>
           <div className={styles.sectionLabel}>ACCOUNT</div>
           <div className={styles.userRow}>
-            <div className={styles.avatar}>HK</div>
+            <div className={styles.avatar}>HR</div>
             <div className={styles.userInfo}>
-              <span className={styles.name}>Harsh Kumar</span>
+              <span className={styles.name}>Harsh Rajput</span>
               <span className={styles.email}>harsh@example.com</span>
             </div>
           </div>
@@ -101,7 +115,15 @@ export const ProfileDropdown = ({ onClose }: Props) => {
         </div>
 
         <div className={styles.section}>
-          <button className={styles.menuItem}>Log out</button>
+          <button
+            className={`${styles.menuItem} ${styles.logoutItem}`}
+            onClick={handleLogout}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '6px' }}>
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+            </svg>
+            Log out
+          </button>
         </div>
       </div>
     </>
