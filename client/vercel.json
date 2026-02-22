@@ -3,6 +3,6 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://your-render-backend-url.onrender.com/api"
+    "NEXT_PUBLIC_API_URL": "https://flowlog-pstj.onrender.com/api"
   }
 }
