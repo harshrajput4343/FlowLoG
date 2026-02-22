@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
 import styles from './ProfileDropdown.module.css';
@@ -10,6 +11,29 @@ interface Props {
 export const ProfileDropdown = ({ onClose }: Props) => {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const [userName, setUserName] = useState('User');
+  const [userEmail, setUserEmail] = useState('');
+  const [userInitials, setUserInitials] = useState('U');
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const user = JSON.parse(stored);
+        const name = user.name || user.email || 'User';
+        const email = user.email || '';
+        setUserName(name);
+        setUserEmail(email);
+        // Show first letter of name only
+        const firstChar = name.trim()[0];
+        if (firstChar) {
+          setUserInitials(firstChar.toUpperCase());
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
 
   const handleLogout = () => {
     // Clear auth session tokens / user data
@@ -31,10 +55,10 @@ export const ProfileDropdown = ({ onClose }: Props) => {
         <div className={styles.section}>
           <div className={styles.sectionLabel}>ACCOUNT</div>
           <div className={styles.userRow}>
-            <div className={styles.avatar}>HR</div>
+            <div className={styles.avatar}>{userInitials}</div>
             <div className={styles.userInfo}>
-              <span className={styles.name}>Harsh Rajput</span>
-              <span className={styles.email}>harsh@example.com</span>
+              <span className={styles.name}>{userName}</span>
+              <span className={styles.email}>{userEmail}</span>
             </div>
           </div>
           <button className={styles.menuItem}>

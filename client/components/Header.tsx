@@ -28,6 +28,22 @@ export const Header = ({ onSearch }: Props) => {
   const [allBoards, setAllBoards] = useState<Board[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const [userInitials, setUserInitials] = useState('U');
+
+  // Load user initial (first letter of name) from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const user = JSON.parse(stored);
+        const name = user.name || user.email || 'U';
+        const firstChar = name.trim()[0];
+        if (firstChar) {
+          setUserInitials(firstChar.toUpperCase());
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   // Fetch all boards on mount
   useEffect(() => {
@@ -178,7 +194,7 @@ export const Header = ({ onSearch }: Props) => {
               className={styles.avatar}
               onClick={() => setShowProfileMenu(!showProfileMenu)}
             >
-              HR
+              {userInitials}
             </div>
             {showProfileMenu && (
               <ProfileDropdown onClose={() => setShowProfileMenu(false)} />

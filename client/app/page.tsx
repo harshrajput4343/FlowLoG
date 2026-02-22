@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { CreateBoardModal } from '@/components/CreateBoardModal';
@@ -15,6 +16,7 @@ interface RecentBoard {
 }
 
 export default function Dashboard() {
+  const router = useRouter();
   const [boards, setBoards] = useState<Board[]>([]);
   const [recentBoards, setRecentBoards] = useState<RecentBoard[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -130,7 +132,14 @@ export default function Dashboard() {
 
               <button
                 className={styles.createBoardCard}
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => {
+                  const token = typeof window !== 'undefined' && localStorage.getItem('authToken');
+                  if (!token || token === 'guest-token') {
+                    router.push('/login');
+                  } else {
+                    setShowCreateModal(true);
+                  }
+                }}
               >
                 <span>Create new board</span>
               </button>

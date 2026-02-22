@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
 
-// Simple login route
+// Login route — find user by email, return token with user ID
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -13,27 +13,27 @@ router.post('/login', async (req, res) => {
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'No account found with this email. Please sign up first.' });
     }
 
-    // Since this is a simple implementation, we'll just check if user exists
-    // In a real app, you'd use bcrypt to compare passwords
-
+    // Simple token-based auth (no password verification in this version)
     res.json({
       message: 'Login successful',
       token: 'flowlog-temp-token-' + user.id,
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        avatarUrl: user.avatarUrl
       }
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Login error:', error.message);
+    res.status(500).json({ error: 'Server error. Please try again later.' });
   }
 });
 
-// Simple signup route
+// Signup route — create a new user, return token
 router.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -47,12 +47,12 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'User already exists with this email' });
     }
 
-    // Create new user
+    // Create new user (no password field in DB — simple auth)
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
-        password // Note: In production you should hash this
+        // avatarUrl can be set later
       }
     });
 
@@ -62,8 +62,43 @@ router.post('/signup', async (req, res) => {
       user: {
         id: newUser.id,
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        avatarUrl: newUser.avatarUrl
       }
+    });
+  } catch (error) {
+    console.error('Signup error:', error.message);
+    res.status(500).json({ error: 'Server error. Please try again later.' });
+  }
+});
+
+// Get current user (for token validation)
+router.get('/me', async (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  const match = token.match(/^flowlog-temp-token-(\d+)$/);
+  if (!match) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(match[1]) }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatarUrl
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -2,7 +2,13 @@ const prisma = require('../prismaClient');
 
 exports.getBoards = async (req, res) => {
   try {
+    const userId = req.userId;
+
+    // Build where clause — if user is authenticated, show only their boards
+    const whereClause = userId ? { ownerId: userId } : {};
+
     const boards = await prisma.board.findMany({
+      where: whereClause,
       include: {
         lists: true,
         members: {
@@ -27,6 +33,8 @@ exports.getBoards = async (req, res) => {
 exports.getBoardById = async (req, res) => {
   const { id } = req.params;
   try {
+    const userId = req.userId;
+
     const board = await prisma.board.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -57,6 +65,11 @@ exports.getBoardById = async (req, res) => {
     });
     if (!board) return res.status(404).json({ error: 'Board not found' });
 
+    // Verify ownership — only the owner or a guest (demo) can access
+    if (userId && board.ownerId !== userId) {
+      return res.status(403).json({ error: 'You do not have access to this board' });
+    }
+
     // Transform to flatten join tables
     const transformedBoard = {
       ...board,
@@ -84,11 +97,14 @@ exports.getBoardById = async (req, res) => {
 exports.createBoard = async (req, res) => {
   const { title, background, ownerId } = req.body;
   try {
+    // Use authenticated user's ID, fall back to provided ownerId, then default to 1
+    const resolvedOwnerId = req.userId || ownerId || 1;
+
     const newBoard = await prisma.board.create({
       data: {
         title,
         background: background || '#0079bf',
-        ownerId: ownerId || 1 // Default to user 1 if not provided
+        ownerId: resolvedOwnerId
       }
     });
 
@@ -110,6 +126,17 @@ exports.createBoard = async (req, res) => {
 exports.deleteBoard = async (req, res) => {
   const { id } = req.params;
   try {
+    const userId = req.userId;
+
+    // Verify ownership before deleting
+    if (userId) {
+      const board = await prisma.board.findUnique({ where: { id: parseInt(id) } });
+      if (!board) return res.status(404).json({ error: 'Board not found' });
+      if (board.ownerId !== userId) {
+        return res.status(403).json({ error: 'You can only delete your own boards' });
+      }
+    }
+
     await prisma.board.delete({
       where: { id: parseInt(id) }
     });
@@ -123,6 +150,17 @@ exports.updateBoard = async (req, res) => {
   const { id } = req.params;
   const { title, background } = req.body;
   try {
+    const userId = req.userId;
+
+    // Verify ownership before updating
+    if (userId) {
+      const board = await prisma.board.findUnique({ where: { id: parseInt(id) } });
+      if (!board) return res.status(404).json({ error: 'Board not found' });
+      if (board.ownerId !== userId) {
+        return res.status(403).json({ error: 'You can only update your own boards' });
+      }
+    }
+
     const updatedBoard = await prisma.board.update({
       where: { id: parseInt(id) },
       data: { title, background }
