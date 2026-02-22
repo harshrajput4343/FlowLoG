@@ -60,19 +60,21 @@ Whether you're managing a personal project or coordinating a team, FlowLoG gives
 | Feature | Description |
 |---|---|
 | 📋 **Board Management** | Create, view, and delete multiple project boards with custom gradient backgrounds |
+| 🔐 **User Authentication** | Secure Login & Signup with password visibility toggle |
 | 📝 **Lists & Cards** | Create lists (columns) and cards (tasks) within boards |
 | 🖱️ **Drag & Drop** | Reorder lists and cards, move cards across lists using smooth drag-and-drop |
 | 🏷️ **Labels** | Assign color-coded labels (Urgent, Required, Not Urgent, etc.) to cards |
 | ✅ **Checklists** | Add checklists with progress tracking inside cards |
 | 👥 **Members** | Assign members to cards and manage board membership |
-| 📅 **Due Dates** | Set and track due dates on cards |
-| 🎨 **Color Picker** | Customize list header colors |
+| ⚖️ **Security (RLS)** | 37 Row-Level Security policies in Supabase protect data at the DB level |
 | 🌗 **Dark / Light Theme** | Toggle between dark and light mode |
 | 🔍 **Search & Filter** | Search cards and filter by labels, members, or due dates |
 | 📱 **Responsive Design** | Fully mobile-friendly and responsive UI |
-| 🚫 **No Login Required** | Demo user auto-logged in for instant access |
+| 🚪 **Mandatory Sign-In** | Accounts required for creating new boards (guests see read-only) |
+| 🎨 **Dynamic UI** | First-letter avatars and real user email display |
 | 📤 **Board Templates** | Pre-configured board templates for quick setup |
 | 🔔 **Notifications** | In-app notification system |
+| 🎨 **Color Picker** | Customize list header colors |
 
 ---
 
@@ -451,6 +453,9 @@ npm run seed        # Seeds demo data
 npm run dev         # Starts on http://localhost:3001
 ```
 
+> [!TIP]
+> Use port `6543` for the `DATABASE_URL` (Supabase Pooler) and the direct host for `DIRECT_URL` to ensure stable connectivity.
+
 ### 4️⃣ Start the Frontend
 
 ```bash
@@ -459,9 +464,9 @@ npm install
 npm run dev         # Starts on http://localhost:3000
 ```
 
-### 5️⃣ Open the App
+### 5️⃣ Create an Account
 
-Navigate to **[http://localhost:3000](http://localhost:3000)** in your browser. 🎉
+Navigate to **[http://localhost:3000/signup](http://localhost:3000/signup)** to create your account. You must be signed in to create new boards.
 
 ---
 

@@ -53,3 +53,7 @@ server/build
 *.njsproj
 *.sln
 *.sw?
+
+
+FlowLoG_Understanding.md
+new_requirement.md

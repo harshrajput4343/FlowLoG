@@ -32,6 +32,8 @@ FlowLoG/
 │   ├── app/                       # Next.js App Router (pages)
 │   │   ├── layout.tsx             # Root layout – wraps entire app with ThemeProvider
 │   │   ├── page.tsx               # Dashboard page – lists all boards
+│   │   ├── login/page.tsx         # Login page with password eye toggle
+│   │   ├── signup/page.tsx        # Signup page with password eye toggle
 │   │   ├── page.module.css        # Dashboard styles
 │   │   ├── globals.css            # Global styles, CSS variables, dark/light theme
 │   │   ├── b/[id]/page.tsx        # Dynamic board page – renders BoardCanvas
@@ -76,6 +78,7 @@ FlowLoG/
     │   └── seed.js                # Seed script – creates demo users, board, lists, cards, labels
     │
     ├── controllers/               # Business logic
+    │   ├── authController.js      # Login, Signup, GetMe operations
     │   ├── boardController.js     # getBoards, getBoardById, createBoard, deleteBoard
     │   ├── listController.js      # createList, reorderLists, updateList, deleteList
     │   ├── cardController.js      # createCard, updateCard, reorderCards, deleteCard
@@ -83,10 +86,13 @@ FlowLoG/
     │   ├── checklistController.js # CRUD checklists & items, toggleChecklistItem
     │   └── memberController.js    # getBoardMembers, assignMemberToCard, removeMemberFromCard, getUsers
     │
+    ├── middleware/                # Custom Middleware
+    │   └── auth.js                # Auth middleware — extracts userId from token
+    │
     └── routes/                    # Express route definitions
         ├── boards.js              # GET /, POST /, GET /:id, DELETE /:id
         ├── lists.js               # POST /, PUT /:id, DELETE /:id, PUT /reorder
-        ├── cards.js               # POST /, PUT /:id, DELETE /:id, PUT /reorder
+        ├── cards.js              # POST /, PUT /:id, DELETE /:id, PUT /reorder
         ├── labels.js              # POST /, PUT /:id, DELETE /:id, POST /card, DELETE /card/:cardId/:labelId
         ├── checklists.js          # POST /, DELETE /:id, POST /:id/items, PUT/PATCH/DELETE items
         ├── members.js             # GET /users, GET /board/:boardId, POST /card, DELETE /card/:cid/:uid
@@ -145,9 +151,10 @@ FlowLoG/
 ├──────────┤       ├─────────────┤       ├──────────┤
 │ id (PK)  │──┐    │ id (PK)     │    ┌──│ id (PK)  │
 │ email    │  │    │ boardId(FK) │────┘  │ title    │
-│ name     │  └───>│ userId (FK) │       │ background│
-│ avatarUrl│       └─────────────┘       │ ownerId  │──> User
-│ createdAt│       @@unique(boardId,     │ createdAt│
+│ authId(U)│  │    │ userId (FK) │       │ background│
+│ name     │  └───>│ userId (FK) │       │ ownerId  │──> User
+│ avatarUrl│       └─────────────┘       │ createdAt│
+│ createdAt│       @@unique(boardId,     │ updatedAt│
 │ updatedAt│        userId)              │ updatedAt│
 └──────────┘                             └────┬─────┘
      │                                        │
@@ -448,10 +455,16 @@ Response: { id, title, lists: [{ cards: [{ labels, members, checklists }] }], me
 **Q11: Why are you using `useCallback` for `filterCards` but not for other handler functions?**
 > `filterCards` is passed as a derived computation that runs on every render to filter lists. `useCallback` memoizes it so it only recalculates when `searchQuery`, `filterLabel`, or `filterMember` change. Other handlers like `handleAddCard` don't benefit from `useCallback` because they're not passed as deps to child memoization.
 
-### Scalability & Production Readiness
+### Auth & Security (New)
 
-**Q12: This app has no authentication. How would you implement it?**
-> Use NextAuth.js (Auth.js) with Supabase Auth provider. Add JWT middleware on Express routes. Store `userId` in session, replace hardcoded `ownerId: 1` with session user. Protect routes with `requireAuth` middleware. On the client, use NextAuth's `useSession()` hook and redirect unauthenticated users.
+**Q16: How does your authentication bridge work between the Express backend and Supabase?**
+> We added an `authId` (UUID) column to the `User` table. Even though the Express backend uses custom tokens for speed, the `authId` allows us to write Supabase RLS policies that use `auth.uid()`, ensuring data is secured at the database level for any future Supabase-direct expansions.
+
+**Q17: Explain your Supabase RLS policy strategy.**
+> We implemented 37 Row-Level Security policies. Most follow a chain: a `Card` is accessible if its `List` is accessible, which is accessible if its `Board` is accessible, which is accessible if the `auth.uid()` matches the Board's `ownerId` (via the User bridge). This ensures robust "defense-in-depth".
+
+**Q18: Why use a first-letter avatar instead of showing the full name or predefined initials?**
+> A single-letter avatar provides a cleaner, more minimalistic UI that aligns with modern Kanban boards (like Jira or Trello). It's simpler to render consistently across different device sizes.
 
 **Q13: How would you add real-time collaboration (multiple users editing the same board)?**
 > Implement WebSocket (Socket.io) on Express. When a user modifies a card/list, broadcast the change to all connected clients on that board's "room". Use optimistic updates locally and reconcile with incoming WebSocket events. Consider CRDT or OT algorithms for conflict resolution on simultaneous edits.
