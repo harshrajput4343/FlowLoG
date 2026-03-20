@@ -180,3 +180,14 @@
   bottom: 12px;
   font-size: 24px;
 }
+
+.proBadge {
+  margin-left: auto;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}

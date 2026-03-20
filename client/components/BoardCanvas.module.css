@@ -218,7 +218,7 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  width: 280px;
+  width: 320px;
   background: var(--dropdown-bg, #282e33);
   border: 1px solid var(--border-color, rgba(255,255,255,0.1));
   border-radius: 8px;
@@ -543,4 +543,172 @@
 .navIcon {
   font-size: 18px;
   margin-bottom: 2px;
+}
+
+/* Unsplash & Premium BG Styles */
+.proBadgeSm {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
+.unsplashCategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.categoryChip {
+  padding: 3px 10px;
+  background: var(--hover-bg, rgba(255,255,255,0.08));
+  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  border-radius: 12px;
+  color: var(--text-secondary, #9fadbc);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.categoryChip:hover {
+  background: rgba(87, 157, 255, 0.15);
+  color: var(--accent-blue, #579dff);
+  border-color: var(--accent-blue, #579dff);
+}
+
+.unsplashGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.unsplashThumb {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.unsplashThumb:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.unsplashLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #9fadbc);
+  padding: 12px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color, rgba(255,255,255,0.1));
+  border-top-color: var(--accent-color, #579dff);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.unsplashError {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #f87168;
+  background: rgba(248, 113, 104, 0.08);
+  border: 1px solid rgba(248, 113, 104, 0.2);
+  border-radius: 4px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.unsplashEmpty {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-secondary, #9fadbc);
+  text-align: center;
+  font-style: italic;
+}
+
+.premiumLock {
+  padding: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px dashed rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary, #9fadbc);
+  text-align: center;
+}
+
+.premiumLockSection {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.premiumLockOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  border-radius: 6px;
+}
+
+.lockContent {
+  text-align: center;
+  font-size: 12px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lockUpgradeLink {
+  color: #f59e0b;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.lockUpgradeLink:hover {
+  text-decoration: underline;
+}
+
+.unsplashPreviewGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 4px;
+}
+
+.unsplashPlaceholder {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: var(--hover-bg, rgba(255,255,255,0.06));
 }

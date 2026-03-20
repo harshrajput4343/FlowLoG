@@ -244,5 +244,64 @@ export const apiClient = {
       throw new Error(err.error || 'Failed to create user');
     }
     return res.json();
-  }
+  },
+
+  // Subscription
+  getSubscriptionStatus: async () => {
+    const res = await fetch(`${API_BASE}/subscription/status`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to fetch subscription status');
+    return res.json();
+  },
+  upgradeSubscription: async () => {
+    const res = await fetch(`${API_BASE}/subscription/upgrade`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to upgrade subscription');
+    return res.json();
+  },
+  cancelSubscription: async () => {
+    const res = await fetch(`${API_BASE}/subscription/cancel`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to cancel subscription');
+    return res.json();
+  },
+
+  // Invitations
+  getInvitations: async (workspaceId: number = 1) => {
+    const res = await fetch(`${API_BASE}/invitations?workspaceId=${workspaceId}`, {
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+  sendInvitation: async (email: string, workspaceId: number = 1) => {
+    const res = await fetch(`${API_BASE}/invitations`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email, workspaceId })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to send invitation');
+    }
+    return res.json();
+  },
+  resendInvitation: async (id: number) => {
+    const res = await fetch(`${API_BASE}/invitations/${id}/resend`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+  cancelInvitation: async (id: number) => {
+    await fetch(`${API_BASE}/invitations/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+  },
 };
+
