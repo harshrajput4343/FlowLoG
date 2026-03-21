@@ -9,6 +9,42 @@ import { apiClient } from '@/utils/api';
 import { Board } from '@/types';
 import styles from './page.module.css';
 
+const HOME_TEMPLATES = [
+  {
+    id: 1,
+    title: 'Project Management',
+    bg: 'linear-gradient(135deg, #00c6fb 0%, #005bea 100%)',
+    lists: [
+      { title: 'Backlog', cards: ['Define project scope', 'Gather requirements', 'Set milestones'] },
+      { title: 'To Do', cards: ['Create wireframes', 'Setup repository', 'Write tech specs'] },
+      { title: 'In Progress', cards: ['Build core features', 'Design UI components'] },
+      { title: 'Done', cards: ['Project kickoff meeting', 'Team onboarding'] }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Daily Task Management',
+    bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    lists: [
+      { title: 'Today', cards: ['Morning standup', 'Review pull requests', 'Update documentation'] },
+      { title: 'This Week', cards: ['Sprint planning', 'Code review session', 'Weekly report'] },
+      { title: 'Someday', cards: ['Learn TypeScript', 'Refactor auth module', 'Write unit tests'] },
+      { title: 'Done', cards: ['Setup dev environment', 'Fix login bug'] }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Remote Team Hub',
+    bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    lists: [
+      { title: 'Announcements', cards: ['Q4 goals published', 'New team member joining', 'Holiday schedule'] },
+      { title: 'This Week', cards: ['Product demo prep', 'Client call Thursday', 'Deploy v2.1'] },
+      { title: 'Async Updates', cards: ['Backend API complete', 'Design review done'] },
+      { title: 'Resources', cards: ['Onboarding guide', 'Team handbook', 'Tech stack docs'] }
+    ]
+  }
+];
+
 interface RecentBoard {
   id: number;
   title: string;
@@ -20,6 +56,9 @@ export default function Dashboard() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [recentBoards, setRecentBoards] = useState<RecentBoard[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<typeof HOME_TEMPLATES[0] | null>(null);
+  const [templateBoardTitle, setTemplateBoardTitle] = useState('');
+  const [creatingFromTemplate, setCreatingFromTemplate] = useState(false);
 
   useEffect(() => {
     apiClient.getBoards().then(data => setBoards(Array.isArray(data) ? data : [])).catch(() => setBoards([]));
@@ -32,6 +71,30 @@ export default function Dashboard() {
   const handleBoardCreated = () => {
     apiClient.getBoards().then(data => setBoards(Array.isArray(data) ? data : [])).catch(() => setBoards([]));
     setShowCreateModal(false);
+  };
+
+  const handleUseTemplate = async () => {
+    if (!selectedTemplate || !templateBoardTitle.trim()) return;
+    const token = localStorage.getItem('authToken');
+    if (!token || token === 'guest-token') {
+      router.push('/login');
+      return;
+    }
+    setCreatingFromTemplate(true);
+    try {
+      const board = await apiClient.createBoard(templateBoardTitle.trim(), selectedTemplate.bg);
+      for (const listData of selectedTemplate.lists) {
+        const list = await apiClient.createList(listData.title, board.id);
+        for (const cardTitle of listData.cards) {
+          await apiClient.createCard(cardTitle, list.id);
+        }
+      }
+      setSelectedTemplate(null);
+      router.push('/b/' + board.id);
+    } catch (err) {
+      console.error('Failed to create board from template:', err);
+      setCreatingFromTemplate(false);
+    }
   };
 
   const getBackgroundStyle = (background?: string) => {
@@ -89,23 +152,24 @@ export default function Dashboard() {
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
               </svg>
               <h2 className={styles.sectionTitle}>Most popular templates</h2>
-              <button className={styles.dismissBtn}>✕</button>
             </div>
             <p className={styles.sectionDesc}>Get going faster with a template from the FlowLog community</p>
 
             <div className={styles.templateGrid}>
-              <div className={styles.templateCard} style={{ background: 'linear-gradient(135deg, #00c6fb 0%, #005bea 100%)' }}>
-                <span className={styles.templateLabel}>TEMPLATE</span>
-                <div className={styles.templateName}>Project Management</div>
-              </div>
-              <div className={styles.templateCard} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-                <span className={styles.templateLabel}>TEMPLATE</span>
-                <div className={styles.templateName}>Daily Task Management</div>
-              </div>
-              <div className={styles.templateCard} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-                <span className={styles.templateLabel}>TEMPLATE</span>
-                <div className={styles.templateName}>Remote Team Hub</div>
-              </div>
+              {HOME_TEMPLATES.map(template => (
+                <div
+                  key={template.id}
+                  className={styles.templateCard}
+                  style={{ background: template.bg, cursor: 'pointer' }}
+                  onClick={() => {
+                    setSelectedTemplate(template);
+                    setTemplateBoardTitle(template.title);
+                  }}
+                >
+                  <span className={styles.templateLabel}>TEMPLATE</span>
+                  <div className={styles.templateName}>{template.title}</div>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -147,6 +211,51 @@ export default function Dashboard() {
           </section>
         </main>
       </div>
+
+      {/* Template Modal */}
+      {selectedTemplate && (
+        <div className={styles.templateModalOverlay} onClick={() => setSelectedTemplate(null)}>
+          <div className={styles.templateModal} onClick={e => e.stopPropagation()}>
+            <button className={styles.templateModalClose} onClick={() => setSelectedTemplate(null)}>×</button>
+            <div className={styles.templateModalPreview} style={{ background: selectedTemplate.bg }}>
+              <div className={styles.templateModalLists}>
+                {selectedTemplate.lists.map(list => (
+                  <div key={list.title} className={styles.templateModalList}>
+                    <div className={styles.templateModalListTitle}>{list.title}</div>
+                    {list.cards.slice(0, 2).map(card => (
+                      <div key={card} className={styles.templateModalCard}>{card}</div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={styles.templateModalContent}>
+              <h2 className={styles.templateModalTitle}>{selectedTemplate.title}</h2>
+              <p className={styles.templateModalDesc}>
+                Includes {selectedTemplate.lists.length} lists: {selectedTemplate.lists.map(l => l.title).join(', ')}
+              </p>
+              <label className={styles.templateModalLabel}>Board Title</label>
+              <input
+                type="text"
+                value={templateBoardTitle}
+                onChange={e => setTemplateBoardTitle(e.target.value)}
+                className={styles.templateModalInput}
+                placeholder="Enter board title..."
+                autoFocus
+                onKeyDown={e => e.key === 'Enter' && handleUseTemplate()}
+              />
+              <button
+                className={styles.templateModalBtn}
+                onClick={handleUseTemplate}
+                disabled={!templateBoardTitle.trim() || creatingFromTemplate}
+              >
+                {creatingFromTemplate ? 'Creating board...' : 'Use Template'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showCreateModal && (
         <CreateBoardModal
           onClose={() => setShowCreateModal(false)}

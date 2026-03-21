@@ -28,6 +28,8 @@ export const Header = ({ onSearch }: Props) => {
   const [allBoards, setAllBoards] = useState<Board[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   const [userInitials, setUserInitials] = useState('U');
 
   // Load user initial (first letter of name) from localStorage
@@ -68,6 +70,32 @@ export const Header = ({ onSearch }: Props) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfileMenu]);
 
   // Filter boards when search query changes
   useEffect(() => {
@@ -168,7 +196,7 @@ export const Header = ({ onSearch }: Props) => {
             Create
           </button>
 
-          <div style={{ position: 'relative' }}>
+          <div ref={notificationsRef} style={{ position: 'relative' }}>
             <button
               className={styles.headerIconBtn}
               title="Notifications"
@@ -189,7 +217,7 @@ export const Header = ({ onSearch }: Props) => {
             </svg>
           </button>
 
-          <div style={{ position: 'relative' }}>
+          <div ref={profileRef} style={{ position: 'relative' }}>
             <div
               className={styles.avatar}
               onClick={() => setShowProfileMenu(!showProfileMenu)}

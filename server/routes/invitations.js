@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
+const { sendInvitationEmail } = require('../utils/emailService');
 const prisma = new PrismaClient();
 
 // In-memory store for invitations (in production, use database)
@@ -33,9 +34,18 @@ router.post('/', async (req, res) => {
 
     invitations.push(invitation);
 
-    // In a real app, send email here using nodemailer or similar
-    console.log(`Invitation email would be sent to: ${email}`);
-    console.log(`Invitation link: http://localhost:3000/invite/${invitation.token}`);
+    // Send the invitation email
+    try {
+      await sendInvitationEmail({
+        toEmail: email,
+        inviterName: 'FlowLoG Team',
+        workspaceName: 'FlowLog Workspace',
+        inviteLink: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/join/${invitation.token}`
+      });
+    } catch (emailError) {
+      console.error('Email send failed:', emailError.message);
+      // Still return success — invitation was created even if email send failed
+    }
 
     res.status(201).json({
       id: invitation.id,

@@ -254,6 +254,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
   const [showBgPanel, setShowBgPanel] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const boardMenuRef = useRef<HTMLDivElement>(null);
+  const filtersRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const animation = requestAnimationFrame(() => setEnabled(true));
@@ -283,6 +284,19 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Close filter popup on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+        setShowFilters(false);
+      }
+    };
+    if (showFilters) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFilters]);
 
   const handleAddList = async () => {
     if (!newListTitle.trim()) return;
@@ -528,7 +542,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
                       {m.name?.[0] || '?'}
                     </div>
                   ))}
-                  <div style={{ position: 'relative' }}>
+                  <div ref={filtersRef} style={{ position: 'relative' }}>
                     <button
                       className={`${styles.boardActionBtn} ${showFilters ? styles.active : ''} ${filterLabel || filterMember ? styles.activeFilter : ''}`}
                       onClick={() => setShowFilters(!showFilters)}

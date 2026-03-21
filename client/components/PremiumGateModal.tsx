@@ -26,8 +26,8 @@ export const PremiumGateModal = ({ isOpen, onClose, featureName }: Props) => {
         </p>
 
         <div className={styles.priceTag}>
-          <span className={styles.price}>$49</span>
-          <span className={styles.period}>/month</span>
+          <span className={styles.price}>$9</span>
+          <span className={styles.period}>/year</span>
         </div>
 
         <div className={styles.features}>

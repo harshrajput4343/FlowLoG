@@ -45,7 +45,7 @@ const upgradeSubscription = async (req, res) => {
     }
 
     const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 30);
+    expiry.setDate(expiry.getDate() + 365);
 
     const user = await prisma.user.update({
       where: { id: req.userId },

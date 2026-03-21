@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { List, Card } from '@/types';
 import { CardItem } from './CardItem';
@@ -35,6 +35,20 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
   const [newCardTitle, setNewCardTitle] = useState('');
   const [showMenu, setShowMenu] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+        setShowColorPicker(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
 
   const handleSaveTitle = async () => {
     if (title.trim() && title !== list.title) {
@@ -112,7 +126,7 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
             )}
             <div className={styles.headerActions}>
               <button className={styles.actionBtn} title="Sparkle" style={headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}}>✦</button>
-              <div className={styles.menuWrapper}>
+              <div ref={menuRef} className={styles.menuWrapper}>
                 <button
                   className={styles.menu}
                   onClick={() => { setShowMenu(!showMenu); setShowColorPicker(false); }}

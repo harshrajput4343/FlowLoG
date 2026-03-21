@@ -91,7 +91,7 @@ export default function PricingPage() {
               <h2 className={styles.planName}>Free</h2>
               <div className={styles.planPrice}>
                 <span className={styles.priceAmount}>$0</span>
-                <span className={styles.pricePeriod}>/month</span>
+                <span className={styles.pricePeriod}>/forever</span>
               </div>
               <ul className={styles.planFeatures}>
                 <li className={styles.planFeature}>✓ Up to 10 boards</li>
@@ -107,12 +107,14 @@ export default function PricingPage() {
             {/* Pro Plan */}
             <div className={`${styles.planCard} ${styles.proPlan}`}>
               <div className={styles.proBadge}>👑 PRO</div>
+              <div className={styles.bestValueBadge}>⭐ Best Value</div>
               {isPremium && <div className={styles.activeBadge}>Active</div>}
               <h2 className={styles.planName}>Pro</h2>
               <div className={styles.planPrice}>
-                <span className={styles.priceAmount}>$49</span>
-                <span className={styles.pricePeriod}>/month</span>
+                <span className={styles.priceAmount}>$9</span>
+                <span className={styles.pricePeriod}>/year</span>
               </div>
+              <div className={styles.savingsText}>Less than $1/month</div>
               <ul className={styles.planFeatures}>
                 {features.map((f, i) => (
                   <li key={i} className={styles.planFeature}>
@@ -162,7 +164,7 @@ export default function PricingPage() {
             <div className={styles.faqGrid}>
               <div className={styles.faqItem}>
                 <h4>Can I cancel anytime?</h4>
-                <p>Yes, you can cancel your subscription at any time. You&apos;ll continue to have access until the end of your billing period.</p>
+                <p>Yes, you can cancel your annual subscription at any time. You&apos;ll continue to have access until the end of your billing year.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>What payment methods do you accept?</h4>
@@ -170,7 +172,7 @@ export default function PricingPage() {
               </div>
               <div className={styles.faqItem}>
                 <h4>Is there a free trial?</h4>
-                <p>The free plan gives you a taste of FlowLog. Upgrade to Pro when you&apos;re ready for more power.</p>
+                <p>The free plan gives you a taste of FlowLog. Upgrade to Pro for just $9/year when you&apos;re ready for more power.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>Can I switch plans?</h4>
