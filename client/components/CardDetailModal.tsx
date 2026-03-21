@@ -322,10 +322,11 @@ export const CardDetailModal = ({
                       {m.avatarUrl ? <img src={m.avatarUrl} alt="" className={styles.memberAvatar} /> : m.name[0]}
                     </div>
                   ))}
+                  <div ref={memberMenuRef} style={{ position: 'relative', display: 'inline-block' }}>
                   <button className={styles.metaBtn} onClick={() => setShowMemberMenu(prev => !prev)}>+</button>
 
                   {showMemberMenu && (
-                    <div ref={memberMenuRef} className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
+                    <div className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
                       <div className={styles.popupHeader}>Members</div>
                       {allUsers.length > 0 ? allUsers.map(m => (
                         <div
@@ -402,6 +403,7 @@ export const CardDetailModal = ({
                       )}
                     </div>
                   )}
+                  </div>
                 </div>
               </div>
 
@@ -413,10 +415,11 @@ export const CardDetailModal = ({
                       {l.name}
                     </div>
                   ))}
+                  <div ref={labelMenuRef} style={{ position: 'relative', display: 'inline-block' }}>
                   <button className={styles.metaBtn} onClick={() => setShowLabelMenu(prev => !prev)}>+</button>
 
                   {showLabelMenu && (
-                    <div ref={labelMenuRef} className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
+                    <div className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
                       <div className={styles.popupHeader}>Labels</div>
 
                       {/* Editing a label */}
@@ -522,6 +525,7 @@ export const CardDetailModal = ({
                       )}
                     </div>
                   )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -95,22 +95,6 @@
   margin: 0 0 16px 0;
 }
 
-.dismissBtn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-}
-
-.dismissBtn:hover {
-  background: var(--hover-bg);
-  color: var(--text-primary);
-}
-
 /* Template Grid */
 .templateGrid {
   display: flex;
@@ -205,4 +189,153 @@
 .createBoardCard:hover {
   background-color: var(--active-bg);
   color: var(--text-primary);
+}
+
+/* Template Modal */
+.templateModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.templateModal {
+  background: var(--modal-bg, #282e33);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 580px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.templateModalClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.templateModalClose:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+.templateModalPreview {
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  overflow: hidden;
+}
+.templateModalLists {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.templateModalList {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 8px;
+  backdrop-filter: blur(4px);
+}
+.templateModalListTitle {
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.templateModalCard {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 10px;
+  color: #172b4d;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.templateModalContent {
+  padding: 24px;
+}
+.templateModalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+.templateModalDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+.templateModalLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.templateModalInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border, var(--border-color));
+  border-radius: 6px;
+  background: var(--input-bg, var(--hover-bg));
+  color: var(--text-primary);
+  font-size: 14px;
+  margin-bottom: 16px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.templateModalInput:focus {
+  outline: none;
+  border-color: var(--accent-color, #579dff);
+  box-shadow: 0 0 0 2px rgba(87, 157, 255, 0.2);
+}
+.templateModalBtn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent-color, #579dff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.templateModalBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.templateModalBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
