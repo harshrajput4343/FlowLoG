@@ -34,6 +34,7 @@ app.use('/api/checklists', require('./routes/checklists'));
 app.use('/api/members', require('./routes/members'));
 app.use('/api/invitations', require('./routes/invitations'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/subscription', require('./routes/subscription'));
 
 // Start Server
 app.listen(PORT, () => {

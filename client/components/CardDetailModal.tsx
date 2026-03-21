@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, Label, User } from '@/types';
 import { apiClient } from '@/utils/api';
+import { isPremiumUser } from '@/utils/premiumGate';
 import styles from './CardDetailModal.module.css';
 
 interface Props {
@@ -342,56 +343,62 @@ export const CardDetailModal = ({
 
                       <div className={styles.popupDivider}></div>
 
-                      {!showAddMember ? (
-                        <button
-                          className={styles.createLabelBtn}
-                          onClick={() => { setShowAddMember(true); setMemberError(''); }}
-                        >
-                          + Add a new member
-                        </button>
-                      ) : (
-                        <div className={styles.createLabelForm}>
-                          {memberError && (
-                            <div style={{ color: '#ff5630', fontSize: '12px', padding: '0 4px' }}>{memberError}</div>
-                          )}
-                          <input
-                            type="text"
-                            placeholder="Name"
-                            value={newMemberName}
-                            onChange={e => setNewMemberName(e.target.value)}
-                            className={styles.labelInput}
-                            autoFocus
-                          />
-                          <input
-                            type="email"
-                            placeholder="Email"
-                            value={newMemberEmail}
-                            onChange={e => setNewMemberEmail(e.target.value)}
-                            className={styles.labelInput}
-                          />
-                          <div className={styles.createLabelActions}>
-                            <button
-                              onClick={async () => {
-                                if (!newMemberName.trim() || !newMemberEmail.trim()) {
-                                  setMemberError('Name and email are required');
-                                  return;
-                                }
-                                try {
-                                  const newUser = await apiClient.createUser(newMemberName.trim(), newMemberEmail.trim());
-                                  setAllUsers([...allUsers, newUser]);
-                                  setNewMemberName('');
-                                  setNewMemberEmail('');
-                                  setShowAddMember(false);
-                                  setMemberError('');
-                                } catch (err: any) {
-                                  setMemberError(err.message || 'Failed to add member');
-                                }
-                              }}
-                              className={styles.createBtn}
-                            >Add</button>
-                            <button onClick={() => { setShowAddMember(false); setMemberError(''); }} className={styles.cancelBtn}>Cancel</button>
+                      {isPremiumUser() ? (
+                        !showAddMember ? (
+                          <button
+                            className={styles.createLabelBtn}
+                            onClick={() => { setShowAddMember(true); setMemberError(''); }}
+                          >
+                            + Add a new member
+                          </button>
+                        ) : (
+                          <div className={styles.createLabelForm}>
+                            {memberError && (
+                              <div style={{ color: '#ff5630', fontSize: '12px', padding: '0 4px' }}>{memberError}</div>
+                            )}
+                            <input
+                              type="text"
+                              placeholder="Name"
+                              value={newMemberName}
+                              onChange={e => setNewMemberName(e.target.value)}
+                              className={styles.labelInput}
+                              autoFocus
+                            />
+                            <input
+                              type="email"
+                              placeholder="Email"
+                              value={newMemberEmail}
+                              onChange={e => setNewMemberEmail(e.target.value)}
+                              className={styles.labelInput}
+                            />
+                            <div className={styles.createLabelActions}>
+                              <button
+                                onClick={async () => {
+                                  if (!newMemberName.trim() || !newMemberEmail.trim()) {
+                                    setMemberError('Name and email are required');
+                                    return;
+                                  }
+                                  try {
+                                    const newUser = await apiClient.createUser(newMemberName.trim(), newMemberEmail.trim());
+                                    setAllUsers([...allUsers, newUser]);
+                                    setNewMemberName('');
+                                    setNewMemberEmail('');
+                                    setShowAddMember(false);
+                                    setMemberError('');
+                                  } catch (err: any) {
+                                    setMemberError(err.message || 'Failed to add member');
+                                  }
+                                }}
+                                className={styles.createBtn}
+                              >Add</button>
+                              <button onClick={() => { setShowAddMember(false); setMemberError(''); }} className={styles.cancelBtn}>Cancel</button>
+                            </div>
                           </div>
-                        </div>
+                        )
+                      ) : (
+                        <a href="/pricing" style={{ display: 'block', padding: '8px', fontSize: '12px', color: '#f59e0b', textDecoration: 'none', textAlign: 'center' }}>
+                          🔒 Upgrade to Pro to add members
+                        </a>
                       )}
                     </div>
                   )}

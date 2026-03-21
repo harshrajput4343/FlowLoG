@@ -1,5 +1,8 @@
 // Simple auth middleware — extracts user ID from the "flowlog-temp-token-{id}" pattern
-const authMiddleware = (req, res, next) => {
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+const authMiddleware = async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
 
   if (!token) {
@@ -10,6 +13,7 @@ const authMiddleware = (req, res, next) => {
   if (token === 'guest-token') {
     req.userId = null;
     req.isGuest = true;
+    req.isPremium = false;
     return next();
   }
 
@@ -18,6 +22,18 @@ const authMiddleware = (req, res, next) => {
   if (match) {
     req.userId = parseInt(match[1]);
     req.isGuest = false;
+
+    // Look up user to attach isPremium
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: req.userId },
+        select: { isPremium: true }
+      });
+      req.isPremium = user?.isPremium || false;
+    } catch {
+      req.isPremium = false;
+    }
+
     return next();
   }
 
@@ -25,6 +41,7 @@ const authMiddleware = (req, res, next) => {
   if (token === 'logged-in') {
     req.userId = null;
     req.isGuest = true;
+    req.isPremium = false;
     return next();
   }
 

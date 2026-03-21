@@ -1,0 +1,131 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 20px;
+}
+
+.card {
+  background: var(--modal-bg, #282e33);
+  border-radius: 16px;
+  padding: 48px 40px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.logoBadge {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #00c2e0, #0079bf);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  color: white;
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary, #b6c2cf);
+  margin: 0;
+}
+
+.inviteIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.successIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary, #b6c2cf);
+  margin: 0 0 12px;
+}
+
+.description {
+  font-size: 14px;
+  color: var(--text-secondary, #9fadbc);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.tokenInfo {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, #9fadbc);
+  margin-bottom: 24px;
+}
+
+.tokenInfo code {
+  color: var(--accent-blue, #579dff);
+  font-family: monospace;
+}
+
+.joinBtn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #579dff, #0c66e4);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 12px;
+}
+
+.joinBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(87, 157, 255, 0.4);
+}
+
+.joinBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.declineBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #9fadbc);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.declineBtn:hover {
+  color: var(--text-primary, #b6c2cf);
+}
+
+.successSection {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

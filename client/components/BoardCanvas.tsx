@@ -9,6 +9,7 @@ import { SwitchBoardsPopup } from './SwitchBoardsPopup';
 import { apiClient } from '@/utils/api';
 import { Header } from './Header';
 import { FilterPopup } from './FilterPopup';
+import { isPremiumUser } from '@/utils/premiumGate';
 import styles from './BoardCanvas.module.css';
 
 interface Props {
@@ -25,6 +26,178 @@ const BG_COLORS = [
   'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
   'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
 ];
+
+const UNSPLASH_CATEGORIES = ['Nature', 'City', 'Abstract', 'Space', 'Mountains', 'Ocean'];
+
+// Background Picker Panel with Unsplash search
+const BgPickerPanel = ({ board, onChangeBg, onBack }: {
+  board: Board;
+  onChangeBg: (bg: string) => void;
+  onBack: () => void;
+}) => {
+  const [unsplashQuery, setUnsplashQuery] = useState('');
+  const [unsplashResults, setUnsplashResults] = useState<any[]>([]);
+  const [unsplashLoading, setUnsplashLoading] = useState(false);
+  const [unsplashError, setUnsplashError] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const premium = typeof window !== 'undefined' && localStorage.getItem('isPremium') === 'true';
+
+  const searchUnsplash = async (query: string) => {
+    if (!query.trim()) return;
+    setUnsplashLoading(true);
+    setUnsplashError('');
+    setHasSearched(true);
+    try {
+      const res = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9&orientation=landscape&client_id=${process.env.NEXT_PUBLIC_UNSPLASH_KEY}`
+      );
+      if (!res.ok) {
+        throw new Error(`Unsplash API error: ${res.status}`);
+      }
+      const data = await res.json();
+      setUnsplashResults(data.results || []);
+    } catch (err: any) {
+      console.error('Unsplash search failed:', err);
+      setUnsplashError(err.message || 'Failed to search images. Please try again.');
+      setUnsplashResults([]);
+    }
+    setUnsplashLoading(false);
+  };
+
+  return (
+    <div className={styles.bgPanel}>
+      <div className={styles.bgPanelHeader}>
+        <button className={styles.bgPanelBack} onClick={onBack}>← Back</button>
+        <span>Change Background</span>
+      </div>
+
+      {/* Colors & Gradients */}
+      <div className={styles.bgSection}>
+        <div className={styles.bgSectionTitle}>Colors & Gradients</div>
+        <div className={styles.bgColorGrid}>
+          {BG_COLORS.map((bg, i) => (
+            <button
+              key={i}
+              className={`${styles.bgColorSwatch} ${board.background === bg ? styles.bgColorSelected : ''}`}
+              style={{ background: bg }}
+              onClick={() => onChangeBg(bg)}
+              title={bg}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Search Images — Premium gated, placed ABOVE custom URL */}
+      <div className={styles.bgSection}>
+        <div className={styles.bgSectionTitle}>
+          Search Images
+          {!premium && <span className={styles.proBadgeSm}>PRO</span>}
+        </div>
+        {premium ? (
+          <>
+            <div className={styles.bgImageRow}>
+              <input
+                type="text"
+                placeholder="Search backgrounds... (e.g. nature, city, space)"
+                className={styles.bgImageInput}
+                value={unsplashQuery}
+                onChange={e => setUnsplashQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && searchUnsplash(unsplashQuery)}
+              />
+              <button
+                className={styles.bgImageApplyBtn}
+                onClick={() => searchUnsplash(unsplashQuery)}
+                disabled={unsplashLoading}
+              >Search</button>
+            </div>
+            <div className={styles.unsplashCategories}>
+              {UNSPLASH_CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  className={styles.categoryChip}
+                  onClick={() => {
+                    setUnsplashQuery(cat);
+                    searchUnsplash(cat);
+                  }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Loading spinner */}
+            {unsplashLoading && (
+              <div className={styles.unsplashLoading}>
+                <div className={styles.spinner} />
+                Searching...
+              </div>
+            )}
+
+            {/* Error message */}
+            {unsplashError && !unsplashLoading && (
+              <div className={styles.unsplashError}>{unsplashError}</div>
+            )}
+
+            {/* Results grid */}
+            {!unsplashLoading && !unsplashError && unsplashResults.length > 0 && (
+              <div className={styles.unsplashGrid}>
+                {unsplashResults.map((photo: any) => (
+                  <button
+                    key={photo.id}
+                    className={styles.unsplashThumb}
+                    style={{ backgroundImage: `url(${photo.urls?.small})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                    onClick={() => onChangeBg(`url(${photo.urls?.regular})`)}
+                    title={photo.alt_description || 'Unsplash photo'}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* No results */}
+            {!unsplashLoading && !unsplashError && hasSearched && unsplashResults.length === 0 && (
+              <div className={styles.unsplashEmpty}>No results found</div>
+            )}
+          </>
+        ) : (
+          <div className={styles.premiumLockSection}>
+            <div className={styles.premiumLockOverlay}>
+              <div className={styles.lockContent}>
+                🔒
+                <span>Upgrade to Pro to unlock image backgrounds</span>
+                <a href="/pricing" className={styles.lockUpgradeLink}>Upgrade Now →</a>
+              </div>
+            </div>
+            <div className={styles.unsplashPreviewGrid}>
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className={styles.unsplashPlaceholder} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Custom Image URL */}
+      <div className={styles.bgSection}>
+        <div className={styles.bgSectionTitle}>Custom Image URL</div>
+        <div className={styles.bgImageRow}>
+          <input
+            type="text"
+            placeholder="Paste image URL..."
+            className={styles.bgImageInput}
+            id="bg-image-url"
+          />
+          <button
+            className={styles.bgImageApplyBtn}
+            onClick={() => {
+              const url = (document.getElementById('bg-image-url') as HTMLInputElement)?.value?.trim();
+              if (url) onChangeBg(`url(${url})`);
+            }}
+          >Apply</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Dynamic Current Date widget
 const LiveDate = () => {
@@ -422,61 +595,15 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
 
                     {/* Background Picker Panel */}
                     {showBgPanel && (
-                      <div className={styles.bgPanel}>
-                        <div className={styles.bgPanelHeader}>
-                          <button
-                            className={styles.bgPanelBack}
-                            onClick={() => setShowBgPanel(false)}
-                          >
-                            ← Back
-                          </button>
-                          <span>Change Background</span>
-                        </div>
-
-                        <div className={styles.bgSection}>
-                          <div className={styles.bgSectionTitle}>Colors & Gradients</div>
-                          <div className={styles.bgColorGrid}>
-                            {BG_COLORS.map((bg, i) => (
-                              <button
-                                key={i}
-                                className={`${styles.bgColorSwatch} ${board.background === bg ? styles.bgColorSelected : ''}`}
-                                style={{ background: bg }}
-                                onClick={() => {
-                                  handleChangeBg(bg);
-                                  setShowBgPanel(false);
-                                  setShowBoardMenu(false);
-                                }}
-                                title={bg}
-                              />
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className={styles.bgSection}>
-                          <div className={styles.bgSectionTitle}>Custom Image URL</div>
-                          <div className={styles.bgImageRow}>
-                            <input
-                              type="text"
-                              placeholder="Paste image URL..."
-                              className={styles.bgImageInput}
-                              id="bg-image-url"
-                            />
-                            <button
-                              className={styles.bgImageApplyBtn}
-                              onClick={() => {
-                                const url = (document.getElementById('bg-image-url') as HTMLInputElement)?.value?.trim();
-                                if (url) {
-                                  handleChangeBg(`url(${url})`);
-                                  setShowBgPanel(false);
-                                  setShowBoardMenu(false);
-                                }
-                              }}
-                            >
-                              Apply
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                      <BgPickerPanel
+                        board={board}
+                        onChangeBg={(bg) => {
+                          handleChangeBg(bg);
+                          setShowBgPanel(false);
+                          setShowBoardMenu(false);
+                        }}
+                        onBack={() => setShowBgPanel(false)}
+                      />
                     )}
                   </div>
                 </div>

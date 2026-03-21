@@ -1,15 +1,23 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Sidebar.module.css';
 
 export const Sidebar = () => {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
+  const [isPremium, setIsPremium] = useState(false);
   const isTemplates = pathname === '/templates';
   const isMembers = pathname === '/members';
   const isSettings = pathname === '/settings';
+  const isPricing = pathname === '/pricing';
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsPremium(localStorage.getItem('isPremium') === 'true');
+    }
+  }, []);
 
   return (
     <nav className={styles.sidebar}>
@@ -79,17 +87,25 @@ export const Sidebar = () => {
             </svg>
             <span>Settings</span>
           </Link>
+
+          <Link href="/pricing" className={`${styles.workspaceSubItem} ${isPricing ? styles.activeSub : ''}`}>
+            <span style={{ fontSize: '16px', width: '16px', textAlign: 'center' }}>👑</span>
+            <span>Upgrade</span>
+            {isPremium && <span className={styles.proBadge}>PRO</span>}
+          </Link>
         </div>
       )}
 
-      {/* Upgrade Banner */}
-      <div className={styles.upgradeBanner}>
-        <div className={styles.upgradeTitle}>Upgrade this Workspace</div>
-        <div className={styles.upgradeDesc}>
-          Get unlimited boards, advanced automation, and more.
-        </div>
-        <div className={styles.upgradeIcon}>💎</div>
-      </div>
+      {/* Upgrade Banner — only for free users */}
+      {!isPremium && (
+        <Link href="/pricing" className={styles.upgradeBanner}>
+          <div className={styles.upgradeTitle}>Upgrade this Workspace</div>
+          <div className={styles.upgradeDesc}>
+            Get unlimited boards, advanced automation, and more.
+          </div>
+          <div className={styles.upgradeIcon}>💎</div>
+        </Link>
+      )}
     </nav>
   );
 };
