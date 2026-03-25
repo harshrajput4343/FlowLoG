@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
-const { sendInvitationEmail } = require('../utils/emailService');
+const { sendInvitationEmail, isEmailConfigured } = require('../utils/emailService');
 const prisma = new PrismaClient();
 
 // In-memory store for invitations (in production, use database)
@@ -34,24 +34,35 @@ router.post('/', async (req, res) => {
 
     invitations.push(invitation);
 
-    // Send the invitation email
-    try {
-      await sendInvitationEmail({
-        toEmail: email,
-        inviterName: 'FlowLoG Team',
-        workspaceName: 'FlowLog Workspace',
-        inviteLink: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/join/${invitation.token}`
-      });
-    } catch (emailError) {
-      console.error('Email send failed:', emailError.message);
-      // Still return success — invitation was created even if email send failed
+    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/join/${invitation.token}`;
+
+    // Send the invitation email (only if configured)
+    let emailSent = false;
+    if (isEmailConfigured) {
+      try {
+        await sendInvitationEmail({
+          toEmail: email,
+          inviterName: 'FlowLoG Team',
+          workspaceName: 'FlowLog Workspace',
+          inviteLink
+        });
+        emailSent = true;
+        console.log('Invitation email sent to:', email);
+      } catch (emailError) {
+        console.error('Email failed:', emailError.message);
+      }
+    } else {
+      console.warn('Email not configured. Set EMAIL_USER and EMAIL_PASS in environment variables.');
+      console.log('Invite link would be:', inviteLink);
     }
 
     res.status(201).json({
       id: invitation.id,
       email: invitation.email,
       status: invitation.status,
-      sentAt: invitation.sentAt
+      sentAt: invitation.sentAt,
+      emailSent,
+      warning: emailSent ? null : 'Email service not configured. Invite link: ' + inviteLink
     });
   } catch (error) {
     console.error('Error sending invitation:', error);

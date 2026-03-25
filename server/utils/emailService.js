@@ -1,14 +1,31 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const isEmailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
-exports.sendInvitationEmail = async ({ toEmail, inviterName, workspaceName, inviteLink }) => {
+let transporter = null;
+
+if (isEmailConfigured) {
+  try {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    console.log('[Email] Service configured with:', process.env.EMAIL_USER);
+  } catch (err) {
+    console.error('[Email] Failed to create transporter:', err.message);
+  }
+} else {
+  console.warn('[Email] Not configured. Set EMAIL_USER and EMAIL_PASS in environment variables.');
+}
+
+const sendInvitationEmail = async ({ toEmail, inviterName, workspaceName, inviteLink }) => {
+  if (!transporter) {
+    throw new Error('Email transporter not configured');
+  }
+
   const mailOptions = {
     from: `"${workspaceName}" <${process.env.EMAIL_USER}>`,
     to: toEmail,
@@ -54,3 +71,5 @@ exports.sendInvitationEmail = async ({ toEmail, inviterName, workspaceName, invi
   };
   await transporter.sendMail(mailOptions);
 };
+
+module.exports = { sendInvitationEmail, isEmailConfigured };

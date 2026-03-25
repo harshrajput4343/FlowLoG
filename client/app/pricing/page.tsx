@@ -29,19 +29,106 @@ export default function PricingPage() {
     }).catch(() => {});
   }, []);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api';
+
+  const getAuthHeaders = (): Record<string, string> => {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  };
+
+  const getCurrentUserEmail = (): string => {
+    if (typeof window === 'undefined') return '';
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.email || '';
+    } catch { return ''; }
+  };
+
   const handleUpgrade = async () => {
     setLoading(true);
     try {
-      const result = await apiClient.upgradeSubscription();
-      setIsPremium(true);
-      setSubscriptionExpiry(result.subscriptionExpiry);
-      localStorage.setItem('isPremium', 'true');
-      localStorage.setItem('subscriptionExpiry', result.subscriptionExpiry);
-      addToast('🎉 Welcome to FlowLog Pro! All premium features are now unlocked.', 'success');
+      // Step 1: Create order
+      const res = await fetch(`${API_URL}/payment/create-order`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Fallback to old upgrade if Razorpay is not configured
+        if (res.status === 503) {
+          const result = await apiClient.upgradeSubscription();
+          setIsPremium(true);
+          setSubscriptionExpiry(result.subscriptionExpiry);
+          localStorage.setItem('isPremium', 'true');
+          localStorage.setItem('subscriptionExpiry', result.subscriptionExpiry);
+          addToast('🎉 Welcome to FlowLog Pro! All premium features are now unlocked.', 'success');
+          setLoading(false);
+          return;
+        }
+        throw new Error(data.error || 'Failed to create order');
+      }
+
+      const { orderId, amount, currency, keyId } = data;
+
+      // Step 2: Load Razorpay script dynamically
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      document.body.appendChild(script);
+      script.onload = () => {
+        const options = {
+          key: keyId,
+          amount,
+          currency,
+          name: 'FlowLog Pro',
+          description: 'Annual Subscription',
+          order_id: orderId,
+          handler: async (response: any) => {
+            // Step 3: Verify payment
+            try {
+              const verifyRes = await fetch(`${API_URL}/payment/verify`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(response),
+              });
+              const verifyData = await verifyRes.json();
+              if (verifyData.success) {
+                setIsPremium(true);
+                localStorage.setItem('isPremium', 'true');
+                addToast('🎉 Payment successful! Welcome to FlowLog Pro!', 'success');
+              } else {
+                addToast('Payment verification failed. Contact support.', 'error');
+              }
+            } catch {
+              addToast('Payment verification failed. Please contact support.', 'error');
+            }
+            setLoading(false);
+          },
+          prefill: {
+            email: getCurrentUserEmail(),
+          },
+          theme: { color: '#f59e0b' },
+          modal: {
+            ondismiss: () => {
+              setLoading(false);
+            },
+          },
+        };
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      };
+      script.onerror = () => {
+        addToast('Failed to load payment gateway. Please try again.', 'error');
+        setLoading(false);
+      };
     } catch (err) {
-      addToast('Failed to upgrade. Please try again.', 'error');
+      addToast('Payment failed. Please try again.', 'error');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleCancel = async () => {

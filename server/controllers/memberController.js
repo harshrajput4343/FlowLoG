@@ -72,3 +72,15 @@ exports.createUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.user.delete({
+      where: { id: parseInt(id) }
+    });
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
