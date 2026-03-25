@@ -1,8 +1,16 @@
 const prisma = require('../prismaClient');
+const { getCache, setCache, deleteCache } = require('../utils/redisClient');
 
 exports.getBoards = async (req, res) => {
   try {
     const userId = req.userId;
+
+    // Try cache first
+    const cacheKey = `boards:user:${userId || 'guest'}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
 
     // Build where clause — if user is authenticated, show only their boards
     const whereClause = userId ? { ownerId: userId } : {};
@@ -24,6 +32,10 @@ exports.getBoards = async (req, res) => {
       ...board,
       members: board.members.map(m => m.user)
     }));
+
+    // Cache for 60 seconds
+    await setCache(cacheKey, transformedBoards, 60);
+
     res.json(transformedBoards);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -34,6 +46,17 @@ exports.getBoardById = async (req, res) => {
   const { id } = req.params;
   try {
     const userId = req.userId;
+
+    // Try cache first
+    const cacheKey = `board:${id}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      // Verify ownership even on cache hit
+      if (userId && cached.ownerId !== userId) {
+        return res.status(403).json({ error: 'You do not have access to this board' });
+      }
+      return res.json(cached);
+    }
 
     const board = await prisma.board.findUnique({
       where: { id: parseInt(id) },
@@ -88,6 +111,9 @@ exports.getBoardById = async (req, res) => {
       }))
     };
 
+    // Cache for 30 seconds
+    await setCache(cacheKey, transformedBoard, 30);
+
     res.json(transformedBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -117,6 +143,9 @@ exports.createBoard = async (req, res) => {
       ]
     });
 
+    // Invalidate boards list cache
+    await deleteCache(`boards:user:${resolvedOwnerId}`);
+
     res.status(201).json(newBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -140,6 +169,11 @@ exports.deleteBoard = async (req, res) => {
     await prisma.board.delete({
       where: { id: parseInt(id) }
     });
+
+    // Invalidate caches
+    await deleteCache(`board:${id}`);
+    if (userId) await deleteCache(`boards:user:${userId}`);
+
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -165,6 +199,11 @@ exports.updateBoard = async (req, res) => {
       where: { id: parseInt(id) },
       data: { title, background }
     });
+
+    // Invalidate caches
+    await deleteCache(`board:${id}`);
+    if (userId) await deleteCache(`boards:user:${userId}`);
+
     res.json(updatedBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });

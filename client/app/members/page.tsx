@@ -135,6 +135,16 @@ export default function MembersPage() {
     });
   };
 
+  const handleRemoveMember = async (userId: number) => {
+    try {
+      await apiClient.deleteUser(userId);
+      setMembers(members.filter(m => m.id !== userId));
+      addToast('Member removed', 'success');
+    } catch (err) {
+      addToast('Failed to remove member', 'error');
+    }
+  };
+
   const getAvatarColor = (name: string) => {
     const colors = ['#0079bf', '#d29034', '#519839', '#b04632', '#89609e', '#cd5a91', '#4bbf6b', '#00aecc'];
     const index = name.charCodeAt(0) % colors.length;
@@ -267,7 +277,7 @@ export default function MembersPage() {
                         </div>
                         <span className={styles.roleBadge}>{isCurrentUser ? 'Admin' : 'Member'}</span>
                         {!isCurrentUser && (
-                          <button className={styles.removeBtn}>Remove</button>
+                          <button className={styles.removeBtn} onClick={() => handleRemoveMember(m.id)}>Remove</button>
                         )}
                       </div>
                     );

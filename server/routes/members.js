@@ -7,5 +7,6 @@ router.post('/users', memberController.createUser);
 router.get('/board/:boardId', memberController.getBoardMembers);
 router.post('/card', memberController.assignMemberToCard);
 router.delete('/card/:cardId/:userId', memberController.removeMemberFromCard);
+router.delete('/users/:id', memberController.deleteUser);
 
 module.exports = router;

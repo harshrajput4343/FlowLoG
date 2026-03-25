@@ -40,28 +40,39 @@ const BgPickerPanel = ({ board, onChangeBg, onBack }: {
   const [unsplashLoading, setUnsplashLoading] = useState(false);
   const [unsplashError, setUnsplashError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [page, setPage] = useState(1);
   const premium = typeof window !== 'undefined' && localStorage.getItem('isPremium') === 'true';
 
-  const searchUnsplash = async (query: string) => {
+  const searchUnsplash = async (query: string, pageNum: number = 1) => {
     if (!query.trim()) return;
     setUnsplashLoading(true);
     setUnsplashError('');
     setHasSearched(true);
     try {
       const res = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9&orientation=landscape&client_id=${process.env.NEXT_PUBLIC_UNSPLASH_KEY}`
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9&page=${pageNum}&orientation=landscape&client_id=${process.env.NEXT_PUBLIC_UNSPLASH_KEY}`
       );
       if (!res.ok) {
         throw new Error(`Unsplash API error: ${res.status}`);
       }
       const data = await res.json();
-      setUnsplashResults(data.results || []);
+      if (pageNum === 1) {
+        setUnsplashResults(data.results || []);
+      } else {
+        setUnsplashResults(prev => [...prev, ...(data.results || [])]);
+      }
     } catch (err: any) {
       console.error('Unsplash search failed:', err);
       setUnsplashError(err.message || 'Failed to search images. Please try again.');
-      setUnsplashResults([]);
+      if (pageNum === 1) setUnsplashResults([]);
     }
     setUnsplashLoading(false);
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    searchUnsplash(unsplashQuery, nextPage);
   };
 
   return (
@@ -102,11 +113,11 @@ const BgPickerPanel = ({ board, onChangeBg, onBack }: {
                 className={styles.bgImageInput}
                 value={unsplashQuery}
                 onChange={e => setUnsplashQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && searchUnsplash(unsplashQuery)}
+                onKeyDown={e => { if (e.key === 'Enter') { setPage(1); searchUnsplash(unsplashQuery, 1); } }}
               />
               <button
                 className={styles.bgImageApplyBtn}
-                onClick={() => searchUnsplash(unsplashQuery)}
+                onClick={() => { setPage(1); searchUnsplash(unsplashQuery, 1); }}
                 disabled={unsplashLoading}
               >Search</button>
             </div>
@@ -117,7 +128,8 @@ const BgPickerPanel = ({ board, onChangeBg, onBack }: {
                   className={styles.categoryChip}
                   onClick={() => {
                     setUnsplashQuery(cat);
-                    searchUnsplash(cat);
+                    setPage(1);
+                    searchUnsplash(cat, 1);
                   }}
                 >
                   {cat}
@@ -140,17 +152,27 @@ const BgPickerPanel = ({ board, onChangeBg, onBack }: {
 
             {/* Results grid */}
             {!unsplashLoading && !unsplashError && unsplashResults.length > 0 && (
-              <div className={styles.unsplashGrid}>
-                {unsplashResults.map((photo: any) => (
-                  <button
-                    key={photo.id}
-                    className={styles.unsplashThumb}
-                    style={{ backgroundImage: `url(${photo.urls?.small})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                    onClick={() => onChangeBg(`url(${photo.urls?.regular})`)}
-                    title={photo.alt_description || 'Unsplash photo'}
-                  />
-                ))}
-              </div>
+              <>
+                <div className={styles.unsplashGrid} style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  {unsplashResults.map((photo: any) => (
+                    <button
+                      key={photo.id}
+                      className={styles.unsplashThumb}
+                      style={{ backgroundImage: `url(${photo.urls?.small})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                      onClick={() => onChangeBg(`url(${photo.urls?.regular})`)}
+                      title={photo.alt_description || 'Unsplash photo'}
+                    />
+                  ))}
+                </div>
+                <button
+                  className={styles.bgImageApplyBtn}
+                  style={{ marginTop: '8px', width: '100%' }}
+                  onClick={handleLoadMore}
+                  disabled={unsplashLoading}
+                >
+                  {unsplashLoading ? 'Loading...' : 'Load More'}
+                </button>
+              </>
             )}
 
             {/* No results */}
@@ -394,11 +416,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
   // Change background handler
   const handleChangeBg = async (bg: string) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api'}/boards/${board.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ background: bg }),
-      });
+      await apiClient.updateBoard(board.id, { background: bg });
       setBoard({ ...board, background: bg });
     } catch (err) {
       console.error('Failed to update background:', err);

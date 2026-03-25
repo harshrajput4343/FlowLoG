@@ -1,4 +1,5 @@
 const express = require('express');
+const keepAlive = require('./utils/keepAlive');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const dotenv = require('dotenv');
@@ -25,6 +26,11 @@ app.get('/', (req, res) => {
   res.send('FlowLog API is running');
 });
 
+// Health check endpoint (used by keep-alive)
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: Date.now() });
+});
+
 // API Routes
 app.use('/api/boards', require('./routes/boards'));
 app.use('/api/lists', require('./routes/lists'));
@@ -35,10 +41,12 @@ app.use('/api/members', require('./routes/members'));
 app.use('/api/invitations', require('./routes/invitations'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/subscription', require('./routes/subscription'));
+app.use('/api/payment', require('./routes/payment'));
 
 // Start Server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  keepAlive();
 });
 
 // Graceful Custom Shutdown??

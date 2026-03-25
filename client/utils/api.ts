@@ -245,6 +245,12 @@ export const apiClient = {
     }
     return res.json();
   },
+  deleteUser: async (id: number) => {
+    await fetch(`${API_BASE}/members/users/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+  },
 
   // Subscription
   getSubscriptionStatus: async () => {
