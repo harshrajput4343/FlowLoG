@@ -90,7 +90,15 @@ export default function MembersPage() {
       const inv = await apiClient.sendInvitation(email);
       setInvitations([...invitations, inv]);
       setEmail('');
-      addToast(`Invitation sent to ${email}`, 'success');
+      if (inv.emailSent) {
+        addToast(`Invitation sent to ${email}`, 'success');
+      } else {
+        addToast(`Invitation saved but email failed to send. ${inv.warning || 'Share the invite link manually.'}`, 'warning');
+        if (inv.inviteLink) {
+          setInviteLink(inv.inviteLink);
+          setShowInviteLink(true);
+        }
+      }
     } catch (err: any) {
       addToast(err.message || 'Failed to send invitation', 'error');
     }

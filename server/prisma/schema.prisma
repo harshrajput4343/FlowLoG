@@ -21,6 +21,7 @@ model User {
   ownedBoards  Board[]       @relation("BoardOwner")
   boardMembers BoardMember[]
   cardMembers  CardMember[]
+  invitations  Invitation[]
 }
 
 model Board {
@@ -116,4 +117,17 @@ model ChecklistItem {
   isChecked   Boolean   @default(false)
   checklistId Int
   checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+}
+
+model Invitation {
+  id          Int      @id @default(autoincrement())
+  email       String
+  token       String   @unique
+  status      String   @default("pending")
+  emailSent   Boolean  @default(false)
+  workspaceId Int      @default(1)
+  senderId    Int
+  sender      User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

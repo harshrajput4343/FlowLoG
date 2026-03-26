@@ -5,18 +5,26 @@ exports.getBoards = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // Try cache first
-    const cacheKey = `boards:user:${userId || 'guest'}`;
+    // Guests cannot list boards
+    if (!userId) {
+      return res.json([]);
+    }
+
+    // Try cache first — always user-specific
+    const cacheKey = `boards:user:${userId}`;
     const cached = await getCache(cacheKey);
     if (cached) {
       return res.json(cached);
     }
 
-    // Build where clause — if user is authenticated, show only their boards
-    const whereClause = userId ? { ownerId: userId } : {};
-
+    // Only show boards owned by or shared with this user
     const boards = await prisma.board.findMany({
-      where: whereClause,
+      where: {
+        OR: [
+          { ownerId: userId },
+          { members: { some: { userId: userId } } }
+        ]
+      },
       include: {
         lists: true,
         members: {
@@ -47,14 +55,10 @@ exports.getBoardById = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // Try cache first
-    const cacheKey = `board:${id}`;
+    // Try cache first — user-specific cache key
+    const cacheKey = `board:${id}:user:${userId || 'guest'}`;
     const cached = await getCache(cacheKey);
     if (cached) {
-      // Verify ownership even on cache hit
-      if (userId && cached.ownerId !== userId) {
-        return res.status(403).json({ error: 'You do not have access to this board' });
-      }
       return res.json(cached);
     }
 
@@ -88,9 +92,14 @@ exports.getBoardById = async (req, res) => {
     });
     if (!board) return res.status(404).json({ error: 'Board not found' });
 
-    // Verify ownership — only the owner or a guest (demo) can access
-    if (userId && board.ownerId !== userId) {
-      return res.status(403).json({ error: 'You do not have access to this board' });
+    // Verify ownership or membership
+    if (userId) {
+      const isMember = board.members.some(m => m.userId === userId);
+      if (board.ownerId !== userId && !isMember) {
+        return res.status(403).json({ error: 'You do not have access to this board' });
+      }
+    } else {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
     // Transform to flatten join tables
@@ -171,7 +180,7 @@ exports.deleteBoard = async (req, res) => {
     });
 
     // Invalidate caches
-    await deleteCache(`board:${id}`);
+    await deleteCache(`board:${id}:user:${userId}`);
     if (userId) await deleteCache(`boards:user:${userId}`);
 
     res.status(204).send();
@@ -201,7 +210,7 @@ exports.updateBoard = async (req, res) => {
     });
 
     // Invalidate caches
-    await deleteCache(`board:${id}`);
+    await deleteCache(`board:${id}:user:${userId}`);
     if (userId) await deleteCache(`boards:user:${userId}`);
 
     res.json(updatedBoard);

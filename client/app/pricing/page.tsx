@@ -13,6 +13,10 @@ export default function PricingPage() {
   const [isPremium, setIsPremium] = useState(false);
   const [subscriptionExpiry, setSubscriptionExpiry] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showUpiModal, setShowUpiModal] = useState(false);
+  const [upiCopied, setUpiCopied] = useState(false);
+  const [confirmingUpi, setConfirmingUpi] = useState(false);
+  const UPI_ID = '6287007845@kotakbank';
   const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
@@ -146,6 +150,29 @@ export default function PricingPage() {
     setCancelling(false);
   };
 
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText(UPI_ID).then(() => {
+      setUpiCopied(true);
+      setTimeout(() => setUpiCopied(false), 2000);
+    });
+  };
+
+  const handleUpiConfirm = async () => {
+    setConfirmingUpi(true);
+    try {
+      const result = await apiClient.upgradeSubscription();
+      setIsPremium(true);
+      setSubscriptionExpiry(result.subscriptionExpiry);
+      localStorage.setItem('isPremium', 'true');
+      localStorage.setItem('subscriptionExpiry', result.subscriptionExpiry);
+      addToast('🎉 Payment confirmed! Welcome to FlowLog Pro!', 'success');
+      setShowUpiModal(false);
+    } catch (err) {
+      addToast('Failed to activate subscription. Please contact support.', 'error');
+    }
+    setConfirmingUpi(false);
+  };
+
   const features = [
     { icon: '📋', text: 'Unlimited boards' },
     { icon: '🖼️', text: 'Dynamic image backgrounds (Unsplash)' },
@@ -231,17 +258,27 @@ export default function PricingPage() {
                   </button>
                 </div>
               ) : (
-                <button
-                  className={styles.upgradeBtn}
-                  onClick={handleUpgrade}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className={styles.loadingDots}>Processing...</span>
-                  ) : (
-                    'Upgrade to Pro'
-                  )}
-                </button>
+                <>
+                  <button
+                    className={styles.upgradeBtn}
+                    onClick={handleUpgrade}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span className={styles.loadingDots}>Processing...</span>
+                    ) : (
+                      'Upgrade to Pro'
+                    )}
+                  </button>
+                  <div className={styles.paymentDivider}>or</div>
+                  <button
+                    className={styles.upiBtn}
+                    onClick={() => setShowUpiModal(true)}
+                    disabled={loading}
+                  >
+                    💳 Pay with UPI
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -255,7 +292,7 @@ export default function PricingPage() {
               </div>
               <div className={styles.faqItem}>
                 <h4>What payment methods do you accept?</h4>
-                <p>We accept all major credit cards, debit cards, and PayPal.</p>
+                <p>We accept all major credit cards, debit cards, UPI (GPay, PhonePe, Paytm), and PayPal.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>Is there a free trial?</h4>
@@ -269,6 +306,38 @@ export default function PricingPage() {
           </div>
         </main>
       </div>
+
+      {/* UPI Payment Modal */}
+      {showUpiModal && (
+        <div className={styles.upiModalOverlay} onClick={() => setShowUpiModal(false)}>
+          <div className={styles.upiModalContent} onClick={e => e.stopPropagation()}>
+            <button className={styles.upiModalClose} onClick={() => setShowUpiModal(false)}>×</button>
+            <h3 className={styles.upiModalTitle}>Pay with UPI</h3>
+            <p className={styles.upiModalDesc}>
+              Send ₹750 to the UPI ID below to activate your FlowLog Pro subscription.
+            </p>
+            <div className={styles.upiIdBox}>
+              <div className={styles.upiIdLabel}>UPI ID</div>
+              <div className={styles.upiIdValue}>{UPI_ID}</div>
+            </div>
+            <button className={styles.upiCopyBtn} onClick={handleCopyUpi}>
+              {upiCopied ? '✓ Copied!' : 'Copy UPI ID'}
+            </button>
+            <ul className={styles.upiSteps}>
+              <li><span className={styles.upiStepNum}>1</span> Open your UPI app (GPay, PhonePe, Paytm, etc.)</li>
+              <li><span className={styles.upiStepNum}>2</span> Send ₹750 to the UPI ID shown above</li>
+              <li><span className={styles.upiStepNum}>3</span> After payment is complete, click the button below</li>
+            </ul>
+            <button
+              className={styles.upiConfirmBtn}
+              onClick={handleUpiConfirm}
+              disabled={confirmingUpi}
+            >
+              {confirmingUpi ? 'Activating...' : 'I have paid — Activate Pro'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
