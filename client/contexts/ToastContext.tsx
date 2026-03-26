@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-export type ToastType = 'success' | 'error' | 'info';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 interface Toast {
   id: number;
@@ -59,6 +59,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                 background:
                   toast.type === 'success' ? 'linear-gradient(135deg, #059669, #10b981)' :
                   toast.type === 'error' ? 'linear-gradient(135deg, #dc2626, #ef4444)' :
+                  toast.type === 'warning' ? 'linear-gradient(135deg, #d97706, #f59e0b)' :
                   'linear-gradient(135deg, #2563eb, #3b82f6)',
                 border: '1px solid rgba(255,255,255,0.15)',
                 maxWidth: '360px',
@@ -66,6 +67,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
             >
               {toast.type === 'success' && '✓ '}
               {toast.type === 'error' && '✕ '}
+              {toast.type === 'warning' && '⚠ '}
               {toast.type === 'info' && 'ℹ '}
               {toast.message}
             </div>
