@@ -177,11 +177,27 @@
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.15s ease;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.saveBtn:hover {
+.saveBtn:hover:not(:disabled) {
   background: #0055cc;
+  transform: translateY(-1px);
+}
+
+.saveBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.saveBtnSuccess {
+  background: #22c55e !important;
+}
+
+.saveBtnError {
+  background: #ef4444 !important;
 }
 
 /* Danger Section */

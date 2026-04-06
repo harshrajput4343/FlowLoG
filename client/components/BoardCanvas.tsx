@@ -390,14 +390,19 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     setSelectedCard(updatedCard);
   };
 
-  const handleCardDelete = () => {
+  const handleCardDelete = async () => {
     if (!selectedCard) return;
-    const updatedLists = board.lists.map(list => ({
-      ...list,
-      cards: list.cards.filter(card => card.id !== selectedCard.id)
-    }));
-    setBoard({ ...board, lists: updatedLists });
-    setSelectedCard(null);
+    try {
+      await apiClient.deleteCard(selectedCard.id);
+      const updatedLists = board.lists.map(list => ({
+        ...list,
+        cards: list.cards.filter(card => card.id !== selectedCard.id)
+      }));
+      setBoard({ ...board, lists: updatedLists });
+      setSelectedCard(null);
+    } catch (err) {
+      console.error('Failed to delete card:', err);
+    }
   };
 
   // Delete board handler

@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -6,6 +7,44 @@ import styles from './page.module.css';
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
+
+  // Workspace state — persisted in localStorage (no DB table yet)
+  const [workspaceName, setWorkspaceName] = useState('FlowLog Workspace');
+  const [workspaceDesc, setWorkspaceDesc] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Load saved values from localStorage on mount
+  useEffect(() => {
+    const savedName = localStorage.getItem('workspaceName');
+    const savedDesc = localStorage.getItem('workspaceDesc');
+    if (savedName) setWorkspaceName(savedName);
+    if (savedDesc) setWorkspaceDesc(savedDesc);
+  }, []);
+
+  const handleSave = async () => {
+    setSaveStatus('saving');
+    try {
+      // Persist to localStorage for now (UI state across pages)
+      localStorage.setItem('workspaceName', workspaceName.trim() || 'FlowLog Workspace');
+      localStorage.setItem('workspaceDesc', workspaceDesc);
+
+      // Dispatch storage event so Sidebar picks it up immediately
+      window.dispatchEvent(new Event('storage'));
+
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+    }
+  };
+
+  const getSaveBtnLabel = () => {
+    if (saveStatus === 'saving') return 'Saving...';
+    if (saveStatus === 'saved') return '✓ Saved!';
+    if (saveStatus === 'error') return 'Error — Try Again';
+    return 'Save Changes';
+  };
 
   return (
     <div className={styles.layoutContainer}>
@@ -82,21 +121,33 @@ export default function SettingsPage() {
               <label className={styles.label}>Workspace Name</label>
               <input
                 type="text"
-                defaultValue="FlowLog Workspace"
+                value={workspaceName}
+                onChange={(e) => setWorkspaceName(e.target.value)}
                 className={styles.input}
+                placeholder="e.g. My Team Workspace"
+                maxLength={60}
               />
             </div>
 
             <div className={styles.formGroup}>
               <label className={styles.label}>Workspace Description</label>
               <textarea
+                value={workspaceDesc}
+                onChange={(e) => setWorkspaceDesc(e.target.value)}
                 placeholder="Add a description..."
                 className={styles.textarea}
                 rows={3}
+                maxLength={200}
               />
             </div>
 
-            <button className={styles.saveBtn}>Save Changes</button>
+            <button
+              className={`${styles.saveBtn} ${saveStatus === 'saved' ? styles.saveBtnSuccess : ''} ${saveStatus === 'error' ? styles.saveBtnError : ''}`}
+              onClick={handleSave}
+              disabled={saveStatus === 'saving'}
+            >
+              {getSaveBtnLabel()}
+            </button>
           </section>
 
           {/* Danger Zone */}

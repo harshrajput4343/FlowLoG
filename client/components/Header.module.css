@@ -38,20 +38,20 @@
 .logoFlow {
   font-family: var(--font-poppins), 'Poppins', sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 32px;
   background: linear-gradient(135deg, #4f8ef7 0%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
 }
 
 .logoLog {
   font-family: var(--font-poppins), 'Poppins', sans-serif;
   font-weight: 800;
-  font-size: 24px;
+  font-size: 32px;
   color: #22c55e;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
 }
 
 .headerCenter {

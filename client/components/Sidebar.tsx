@@ -8,6 +8,7 @@ export const Sidebar = () => {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const [workspaceName, setWorkspaceName] = useState('FlowLog Workspace');
   const isTemplates = pathname === '/templates';
   const isMembers = pathname === '/members';
   const isSettings = pathname === '/settings';
@@ -16,7 +17,14 @@ export const Sidebar = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsPremium(localStorage.getItem('isPremium') === 'true');
+      setWorkspaceName(localStorage.getItem('workspaceName') || 'FlowLog Workspace');
     }
+    // Listen for workspace name updates from Settings page
+    const handleStorage = () => {
+      setWorkspaceName(localStorage.getItem('workspaceName') || 'FlowLog Workspace');
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   return (
@@ -49,7 +57,7 @@ export const Sidebar = () => {
       {/* Workspace Item */}
       <div className={styles.workspaceItem} onClick={() => setExpanded(!expanded)}>
         <div className={styles.workspaceLogo}>F</div>
-        <span className={styles.workspaceName}>FlowLog Workspace</span>
+        <span className={styles.workspaceName}>{workspaceName}</span>
         <svg
           className={`${styles.chevron} ${expanded ? styles.expanded : ''}`}
           width="16"
