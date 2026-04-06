@@ -61,15 +61,44 @@ export default function Dashboard() {
   const [creatingFromTemplate, setCreatingFromTemplate] = useState(false);
 
   useEffect(() => {
-    apiClient.getBoards().then(data => setBoards(Array.isArray(data) ? data : [])).catch(() => setBoards([]));
+    // 1) Instantly paint boards from localStorage so the grid is never empty
+    try {
+      const cached = localStorage.getItem('cachedBoards');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setBoards(parsed);
+        }
+      }
+    } catch (_) {}
 
-    // Load recent boards from localStorage
-    const recent = JSON.parse(localStorage.getItem('recentBoards') || '[]');
-    setRecentBoards(recent);
+    // 2) Silently revalidate in the background and update both state + cache
+    apiClient.getBoards()
+      .then(data => {
+        const list = Array.isArray(data) ? data : [];
+        setBoards(list);
+        // Keep localStorage fresh for the next visit
+        try { localStorage.setItem('cachedBoards', JSON.stringify(list)); } catch (_) {}
+      })
+      .catch(() => {
+        // If network fails, the localStorage snapshot is already showing — do nothing
+      });
+
+    // 3) Load recent boards from localStorage
+    try {
+      const recent = JSON.parse(localStorage.getItem('recentBoards') || '[]');
+      setRecentBoards(recent);
+    } catch (_) {}
   }, []);
 
   const handleBoardCreated = () => {
-    apiClient.getBoards().then(data => setBoards(Array.isArray(data) ? data : [])).catch(() => setBoards([]));
+    apiClient.getBoards()
+      .then(data => {
+        const list = Array.isArray(data) ? data : [];
+        setBoards(list);
+        try { localStorage.setItem('cachedBoards', JSON.stringify(list)); } catch (_) {}
+      })
+      .catch(() => {});
     setShowCreateModal(false);
   };
 

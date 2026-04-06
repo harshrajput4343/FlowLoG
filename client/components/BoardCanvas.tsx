@@ -286,13 +286,27 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     };
   }, []);
 
-  // Store recently viewed boards
+  // Store recently viewed boards and sync with cachedBoards
   useEffect(() => {
-    const recentBoards = JSON.parse(localStorage.getItem('recentBoards') || '[]');
-    const boardInfo = { id: board.id, title: board.title, background: board.background };
-    const filtered = recentBoards.filter((b: { id: number }) => b.id !== board.id);
-    const updated = [boardInfo, ...filtered].slice(0, 5);
-    localStorage.setItem('recentBoards', JSON.stringify(updated));
+    // Update recentBoards
+    try {
+      const recentBoards = JSON.parse(localStorage.getItem('recentBoards') || '[]');
+      const boardInfo = { id: board.id, title: board.title, background: board.background };
+      const filtered = recentBoards.filter((b: { id: number }) => b.id !== board.id);
+      const updated = [boardInfo, ...filtered].slice(0, 5);
+      localStorage.setItem('recentBoards', JSON.stringify(updated));
+    } catch (_) {}
+
+    // Also update this board's entry in the cachedBoards list
+    try {
+      const cached = JSON.parse(localStorage.getItem('cachedBoards') || '[]');
+      if (Array.isArray(cached)) {
+        const updated = cached.map((b: { id: number; title: string; background?: string }) =>
+          b.id === board.id ? { ...b, title: board.title, background: board.background } : b
+        );
+        localStorage.setItem('cachedBoards', JSON.stringify(updated));
+      }
+    } catch (_) {}
   }, [board.id, board.title, board.background]);
 
   // Close board menu / bg panel on outside click
@@ -410,8 +424,15 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
     try {
       await apiClient.deleteBoard(board.id);
       // Remove from recent boards
-      const recent = JSON.parse(localStorage.getItem('recentBoards') || '[]');
-      localStorage.setItem('recentBoards', JSON.stringify(recent.filter((b: { id: number }) => b.id !== board.id)));
+      try {
+        const recent = JSON.parse(localStorage.getItem('recentBoards') || '[]');
+        localStorage.setItem('recentBoards', JSON.stringify(recent.filter((b: { id: number }) => b.id !== board.id)));
+      } catch (_) {}
+      // Remove from cachedBoards
+      try {
+        const cached = JSON.parse(localStorage.getItem('cachedBoards') || '[]');
+        localStorage.setItem('cachedBoards', JSON.stringify(cached.filter((b: { id: number }) => b.id !== board.id)));
+      } catch (_) {}
       router.push('/');
     } catch (err) {
       console.error('Failed to delete board:', err);
