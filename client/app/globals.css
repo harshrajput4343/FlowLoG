@@ -1,30 +1,5 @@
-/* Dark Theme (default) */
+/* Light Theme (default) */
 :root,
-[data-theme="dark"] {
-  --board-bg: #1d2125;
-  --list-bg: #101204;
-  --card-bg: #22272b;
-  --header-bg: #1d2125;
-  --sidebar-bg: #1d2125;
-  --text-primary: #b6c2cf;
-  --text-secondary: #9fadbc;
-  --accent-color: #579dff;
-  --accent-green: #579dff;
-  --accent-blue: #579dff;
-  --surface-overlay: #282e33;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --hover-bg: rgba(255, 255, 255, 0.08);
-  --active-bg: rgba(87, 157, 255, 0.16);
-  --modal-bg: #282e33;
-  --input-bg: #22272b;
-  --input-border: #738496;
-  --dropdown-bg: #282e33;
-  --scrollbar-track: rgba(255, 255, 255, 0.1);
-  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
-  --body-bg: #1d2125;
-}
-
-/* Light Theme */
 [data-theme="light"] {
   --board-bg: #f1f2f4;
   --list-bg: #ffffff;
@@ -47,6 +22,31 @@
   --scrollbar-track: rgba(9, 30, 66, 0.08);
   --scrollbar-thumb: rgba(9, 30, 66, 0.13);
   --body-bg: #f1f2f4;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --board-bg: #1d2125;
+  --list-bg: #101204;
+  --card-bg: #22272b;
+  --header-bg: #1d2125;
+  --sidebar-bg: #1d2125;
+  --text-primary: #b6c2cf;
+  --text-secondary: #9fadbc;
+  --accent-color: #579dff;
+  --accent-green: #579dff;
+  --accent-blue: #579dff;
+  --surface-overlay: #282e33;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --hover-bg: rgba(255, 255, 255, 0.08);
+  --active-bg: rgba(87, 157, 255, 0.16);
+  --modal-bg: #282e33;
+  --input-bg: #22272b;
+  --input-border: #738496;
+  --dropdown-bg: #282e33;
+  --scrollbar-track: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --body-bg: #1d2125;
 }
 
 body {
