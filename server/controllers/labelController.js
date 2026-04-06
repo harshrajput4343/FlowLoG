@@ -1,4 +1,5 @@
 const prisma = require('../prismaClient');
+const { deleteCachePattern } = require('../utils/redisClient');
 
 exports.createLabel = async (req, res) => {
   const { name, color, boardId } = req.body;
@@ -6,6 +7,8 @@ exports.createLabel = async (req, res) => {
     const label = await prisma.label.create({
       data: { name, color, boardId }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(201).json(label);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -20,6 +23,8 @@ exports.updateLabel = async (req, res) => {
       where: { id: parseInt(id) },
       data: { name, color }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.json(label);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -30,6 +35,8 @@ exports.deleteLabel = async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.label.delete({ where: { id: parseInt(id) } });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -43,6 +50,8 @@ exports.addLabelToCard = async (req, res) => {
       data: { cardId, labelId },
       include: { label: true }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(201).json(cardLabel.label);
   } catch (error) {
     if (error.code === 'P2002') {
@@ -63,6 +72,8 @@ exports.removeLabelFromCard = async (req, res) => {
         }
       }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });

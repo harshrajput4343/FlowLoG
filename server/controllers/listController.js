@@ -1,4 +1,5 @@
 const prisma = require('../prismaClient');
+const { deleteCachePattern } = require('../utils/redisClient');
 
 exports.createList = async (req, res) => {
   const { title, boardId } = req.body;
@@ -17,6 +18,8 @@ exports.createList = async (req, res) => {
         order
       }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(201).json(list);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -34,6 +37,8 @@ exports.reorderLists = async (req, res) => {
       })
     );
     await prisma.$transaction(transaction);
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(200).json({ message: 'Lists reordered successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -44,6 +49,8 @@ exports.deleteList = async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.list.delete({ where: { id: parseInt(id) } });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -61,6 +68,8 @@ exports.updateList = async (req, res) => {
       where: { id: parseInt(id) },
       data
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.json(list);
   } catch (error) {
     res.status(500).json({ error: error.message });

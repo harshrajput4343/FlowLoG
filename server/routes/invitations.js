@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
 const { sendInvitationEmail, isEmailConfigured } = require('../utils/emailService');
+const { deleteCache, deleteCachePattern } = require('../utils/redisClient');
 const authMiddleware = require('../middleware/auth');
 
 // Helper function to generate token
@@ -200,9 +201,14 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // Accept invitation (when user clicks link)
-router.post('/accept/:token', async (req, res) => {
+router.post('/accept/:token', authMiddleware, async (req, res) => {
   try {
     const { token } = req.params;
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required to join board' });
+    }
 
     const invitation = await prisma.invitation.findUnique({
       where: { token }
@@ -212,12 +218,33 @@ router.post('/accept/:token', async (req, res) => {
       return res.status(404).json({ error: 'Invalid or expired invitation' });
     }
 
-    await prisma.invitation.update({
-      where: { id: invitation.id },
-      data: { status: 'accepted' }
+    // Add user as board member
+    const boardId = invitation.workspaceId;
+    
+    // Check if already a member
+    const existingMember = await prisma.boardMember.findUnique({
+      where: {
+        boardId_userId: { boardId, userId }
+      }
     });
 
-    res.json({ message: 'Invitation accepted', workspaceId: invitation.workspaceId });
+    if (!existingMember) {
+      await prisma.boardMember.create({
+        data: { boardId, userId }
+      });
+    }
+
+    // Mark invitation as accepted (or just delete it)
+    await prisma.invitation.delete({
+      where: { id: invitation.id }
+    });
+
+    // Invalidate caches
+    await deleteCache(`boards:user:${userId}`);
+    await deleteCachePattern(`board:${boardId}:user:*`);
+    await deleteCache(`board:${boardId}:members`); // Invalidate the members cache we just added
+
+    res.json({ message: 'Invitation accepted', boardId });
   } catch (error) {
     console.error('Error accepting invitation:', error);
     res.status(500).json({ error: 'Failed to accept invitation' });

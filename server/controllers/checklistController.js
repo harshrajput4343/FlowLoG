@@ -1,4 +1,5 @@
 const prisma = require('../prismaClient');
+const { deleteCachePattern } = require('../utils/redisClient');
 
 exports.createChecklist = async (req, res) => {
   const { title, cardId } = req.body;
@@ -7,6 +8,8 @@ exports.createChecklist = async (req, res) => {
       data: { title, cardId },
       include: { items: true }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(201).json(checklist);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -17,6 +20,8 @@ exports.deleteChecklist = async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.checklist.delete({ where: { id: parseInt(id) } });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -33,6 +38,8 @@ exports.addChecklistItem = async (req, res) => {
         checklistId: parseInt(id)
       }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(201).json(item);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -51,6 +58,8 @@ exports.toggleChecklistItem = async (req, res) => {
       where: { id: parseInt(id) },
       data: { isChecked: !item.isChecked }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.json(updated);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -65,6 +74,8 @@ exports.updateChecklistItem = async (req, res) => {
       where: { id: parseInt(id) },
       data: { content, isChecked }
     });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.json(item);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -75,6 +86,8 @@ exports.deleteChecklistItem = async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.checklistItem.delete({ where: { id: parseInt(id) } });
+    // Invalidate board detail caches
+    await deleteCachePattern(`board:*:user:*`);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });

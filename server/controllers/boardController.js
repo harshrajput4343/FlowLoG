@@ -152,7 +152,7 @@ exports.createBoard = async (req, res) => {
       ]
     });
 
-    // Invalidate boards list cache
+    // Invalidate boards list cache for this user
     await deleteCache(`boards:user:${resolvedOwnerId}`);
 
     res.status(201).json(newBoard);
@@ -179,9 +179,13 @@ exports.deleteBoard = async (req, res) => {
       where: { id: parseInt(id) }
     });
 
-    // Invalidate caches
-    await deleteCache(`board:${id}:user:${userId}`);
+    // Invalidate caches for ALL users who might have this board (pattern match)
+    await deleteCachePattern(`board:${id}:user:*`);
+    // Invalidate boards list for owner
     if (userId) await deleteCache(`boards:user:${userId}`);
+    // Also invalidate everyone's board list since a board was deleted? 
+    // (Optimization: we could find all members first, but pattern is safer if we track boards:user)
+    await deleteCachePattern(`boards:user:*`);
 
     res.status(204).send();
   } catch (error) {
@@ -209,9 +213,12 @@ exports.updateBoard = async (req, res) => {
       data: { title, background }
     });
 
-    // Invalidate caches
-    await deleteCache(`board:${id}:user:${userId}`);
+    // Invalidate caches for ALL users who might have this board (pattern match)
+    await deleteCachePattern(`board:${id}:user:*`);
+    // Invalidate boards list for owner
     if (userId) await deleteCache(`boards:user:${userId}`);
+    // Also invalidate everyone's board list to show the new title/background
+    await deleteCachePattern(`boards:user:*`);
 
     res.json(updatedBoard);
   } catch (error) {

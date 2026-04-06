@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const { getCache, setCache, deleteCache } = require('../utils/redisClient');
 
 // GET /api/subscription/status
 const getSubscriptionStatus = async (req, res) => {
@@ -7,6 +8,10 @@ const getSubscriptionStatus = async (req, res) => {
     if (!req.userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
+
+    const cacheKey = `sub:user:${req.userId}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return res.json(cached);
 
     const user = await prisma.user.findUnique({
       where: { id: req.userId },
@@ -26,11 +31,13 @@ const getSubscriptionStatus = async (req, res) => {
       return res.json({ isPremium: false, subscriptionExpiry: null, plan: null });
     }
 
-    res.json({
+    const result = {
       isPremium: user.isPremium,
       subscriptionExpiry: user.subscriptionExpiry,
       plan: user.subscriptionPlan
-    });
+    };
+    await setCache(cacheKey, result, 600); // 10 min
+    res.json(result);
   } catch (error) {
     console.error('Error fetching subscription status:', error);
     res.status(500).json({ error: 'Failed to fetch subscription status' });
@@ -55,6 +62,9 @@ const upgradeSubscription = async (req, res) => {
         subscriptionPlan: 'pro'
       }
     });
+
+    // Invalidate subscription cache
+    await deleteCache(`sub:user:${req.userId}`);
 
     res.json({
       message: 'Successfully upgraded to Pro!',
@@ -83,6 +93,9 @@ const cancelSubscription = async (req, res) => {
         subscriptionExpiry: null
       }
     });
+
+    // Invalidate subscription cache
+    await deleteCache(`sub:user:${req.userId}`);
 
     res.json({ message: 'Subscription cancelled', isPremium: false });
   } catch (error) {
