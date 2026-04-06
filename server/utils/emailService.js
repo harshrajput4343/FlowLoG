@@ -7,13 +7,25 @@ let transporter = null;
 if (isEmailConfigured) {
   try {
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // use SSL
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
-    console.log('[Email] Service configured with:', process.env.EMAIL_USER);
+    
+    // Verify connection on startup
+    transporter.verify((error, success) => {
+      if (error) {
+        console.error('[Email] Connection verification failed:', error.message);
+      } else {
+        console.log('[Email] Server is ready to take our messages');
+      }
+    });
+
+    console.log('[Email] Service configured for:', process.env.EMAIL_USER);
   } catch (err) {
     console.error('[Email] Failed to create transporter:', err.message);
   }
@@ -69,7 +81,20 @@ const sendInvitationEmail = async ({ toEmail, inviterName, workspaceName, invite
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('[Email] Message sent: %s', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('[Email] Error details:', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      response: error.response,
+      responseCode: error.responseCode
+    });
+    throw error;
+  }
 };
 
 module.exports = { sendInvitationEmail, isEmailConfigured };
