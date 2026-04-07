@@ -25,6 +25,8 @@
   <img src="https://img.shields.io/badge/Supabase-Cloud-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
   <img src="https://img.shields.io/badge/Vercel-Deployed-000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel" />
   <img src="https://img.shields.io/badge/Render-Backend-46E3B7?style=flat-square&logo=render&logoColor=white" alt="Render" />
+  <img src="https://img.shields.io/badge/Redis-Caching-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis" />
+  <img src="https://img.shields.io/badge/Razorpay-Payments-02042B?style=flat-square&logo=razorpay&logoColor=white" alt="Razorpay" />
 </p>
 
 ---
@@ -49,13 +51,35 @@
 
 ## 🌟 Overview
 
-**FlowLoG** is a feature-rich, Trello-inspired Kanban board application designed for seamless project and task management. Built with a modern full-stack architecture, it provides an intuitive drag-and-drop interface to organize tasks across customizable boards, lists, and cards — all with real-time interactivity, dark/light themes, and cloud deployment.
+**FlowLoG** is a feature-rich, Trello-inspired Kanban board application designed for seamless project and task management. Built with a modern full-stack architecture, it provides an intuitive drag-and-drop interface to organize tasks across customizable boards, lists, and cards — all with real-time interactivity, a premium liquid glassmorphism UI, and cloud deployment.
 
-Whether you're managing a personal project or coordinating a team, FlowLoG gives you the tools to visualize your workflow and stay productive.
+Whether you're managing a personal project or coordinating a team, FlowLoG gives you the tools to visualize your workflow and stay productive with zero latency via optimistic rendering and our built-in FlowGuide AI assistant.
 
 ---
 
-## ✨ Features
+## 💎 Advanced Features Showcase
+
+### 🎨 Liquid Glassmorphism & Dynamic UI
+FlowLoG moves beyond standard flat designs by implementing a premium **Liquid Glassmorphism** layered architecture. Instead of solid colors, the interface utilizes dynamically blurred overlays (`backdrop-filter: blur()`), floating fluid background blobs with CSS animations, and seamless dark/light theme switching. A custom blue-to-teal gradient scale dynamically reacts to the user's context, ensuring an immersive and highly polished visual experience across the dashboard, settings, and member panels.
+
+### 🤖 FlowGuide AI Integration
+To provide users with immediate assistance, the **FlowGuide AI Context-Aware Assistant** is built directly into the application. It resides in a globally accessible floating panel, offering project workflow tips, helping users understand board mechanics, and acting as an instantly available co-pilot for maximizing your Kanban productivity.
+
+### ⚡ Optimistic Rendering Architecture
+To completely eliminate UI flickering and guarantee a zero-latency feel—even when navigating complex hierarchical data—FlowLoG implements a rigorous **Optimistic UI Caching Strategy**. When navigating to the dashboard, board configurations are instantly painted to the screen via `localStorage`. Simultaneously, a background synchronization process silently fetches fresh data from the Postgres database ensuring you never stare at a loading spinner.
+
+### 📬 Seamless SMTP Email Invitations
+Building teams has never been easier. Leveraging **Nodemailer and SMTP integrations**, users can invite members directly to their boards. The backend securely crafts and distributes these interactive invites, tying the abstract act of "adding a user" to highly reliable, real-world email triggers.
+
+### 💳 Razorpay Payment Gateway Integration
+Scaling from a personal tool to a premium SaaS product is supported natively through robust **Razorpay** payment processing. This handles subscription workflows, payment verifications, and premium feature unlocks fluidly straight out of the box.
+
+### ⏱️ Resilient Cloud Infrastructure (Keep-Alive)
+Because the backend API is hosted on Render's free tier (which forcibly spins down after 15 minutes of inactivity), an automated **Node-Cron / Axios Keep-Alive** utility continuously self-pings the application. This ensures the connection pool to the Supabase database remains hot and entirely bypasses the notorious 30+ second cloud cold-start delays.
+
+---
+
+## 📋 Core Capabilities
 
 | Feature | Description |
 |---|---|
@@ -67,14 +91,13 @@ Whether you're managing a personal project or coordinating a team, FlowLoG gives
 | ✅ **Checklists** | Add checklists with progress tracking inside cards |
 | 👥 **Members** | Assign members to cards and manage board membership |
 | ⚖️ **Security (RLS)** | 37 Row-Level Security policies in Supabase protect data at the DB level |
-| 🌗 **Dark / Light Theme** | Toggle between dark and light mode |
+| 🌗 **Dark / Light Theme** | Toggle between dark and light mode flawlessly |
 | 🔍 **Search & Filter** | Search cards and filter by labels, members, or due dates |
 | 📱 **Responsive Design** | Fully mobile-friendly and responsive UI |
 | 🚪 **Mandatory Sign-In** | Accounts required for creating new boards (guests see read-only) |
-| 🎨 **Dynamic UI** | First-letter avatars and real user email display |
+| 🎨 **Dynamic Avatars** | First-letter avatars and real user email display |
 | 📤 **Board Templates** | Pre-configured board templates for quick setup |
-| 🔔 **Notifications** | In-app notification system |
-| 🎨 **Color Picker** | Customize list header colors |
+| 🔔 **Notifications** | In-app notification system with elegant outline icons |
 
 ---
 
@@ -117,7 +140,10 @@ Whether you're managing a personal project or coordinating a team, FlowLoG gives
 | [Supabase](https://supabase.com/) | Cloud-hosted PostgreSQL database |
 | [CORS](https://www.npmjs.com/package/cors) | Cross-origin resource sharing middleware |
 | [dotenv](https://www.npmjs.com/package/dotenv) | Environment variable management |
-| [Nodemon](https://nodemon.io/) | Auto-restart during development |
+| [Redis](https://redis.io/) | In-memory caching for lightning-fast backend performance |
+| [Razorpay](https://razorpay.com/) | Modern payment gateway integrations |
+| [Nodemailer](https://nodemailer.com/) | SMTP email distribution for board and team invitations |
+| [Node-Cron/Axios](https://github.com/axios/axios) | Automated keep-alive jobs to bypass PaaS cold starts |
 
 ### DevOps & Deployment
 | Service | Role |
@@ -518,7 +544,9 @@ Uncomment and add your screenshots:
 | **Prisma ORM** | Type-safe queries, auto-generated migrations, excellent DX |
 | **Supabase** | Free managed PostgreSQL with connection pooling — zero DB ops overhead |
 | **@hello-pangea/dnd** | Maintained fork of `react-beautiful-dnd` — reliable drag-and-drop |
-| **No Auth** | Demo-first approach — removes friction for showcasing functionality |
+| **Optimistic Rendering** | `localStorage` serves cached layouts instantly while the background UI syncs seamless updates |
+| **Liquid Glassmorphism** | Replacing standard solid layers with highly translucent, blurred panels and fluid background blobs |
+| **Keep-Alive Server** | Render free-tier APIs sleep after 15 mins. A node script intercepts downtime to guarantee immediate frontend capability |
 | **Cascade Deletes** | Prisma `onDelete: Cascade` ensures data integrity across relations |
 
 ---
