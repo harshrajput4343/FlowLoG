@@ -13,7 +13,7 @@ const HOME_TEMPLATES = [
   {
     id: 1,
     title: 'Project Management',
-    bg: 'linear-gradient(135deg, #00c6fb 0%, #005bea 100%)',
+    bg: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
     lists: [
       { title: 'Backlog', cards: ['Define project scope', 'Gather requirements', 'Set milestones'] },
       { title: 'To Do', cards: ['Create wireframes', 'Setup repository', 'Write tech specs'] },
@@ -24,7 +24,7 @@ const HOME_TEMPLATES = [
   {
     id: 2,
     title: 'Daily Task Management',
-    bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    bg: 'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)',
     lists: [
       { title: 'Today', cards: ['Morning standup', 'Review pull requests', 'Update documentation'] },
       { title: 'This Week', cards: ['Sprint planning', 'Code review session', 'Weekly report'] },
@@ -35,7 +35,7 @@ const HOME_TEMPLATES = [
   {
     id: 3,
     title: 'Remote Team Hub',
-    bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    bg: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
     lists: [
       { title: 'Announcements', cards: ['Q4 goals published', 'New team member joining', 'Holiday schedule'] },
       { title: 'This Week', cards: ['Product demo prep', 'Client call Thursday', 'Deploy v2.1'] },
@@ -127,15 +127,23 @@ export default function Dashboard() {
   };
 
   const getBackgroundStyle = (background?: string) => {
-    if (!background) return { background: 'linear-gradient(135deg, #0079bf 0%, #5067c5 100%)' };
+    if (!background) return { background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' };
     if (background.startsWith('linear')) return { background };
     if (background.startsWith('url')) return { backgroundImage: background, backgroundSize: 'cover' };
     if (background.startsWith('#')) return { background };
-    return { background: 'linear-gradient(135deg, #0079bf 0%, #5067c5 100%)' };
+    return { background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)' };
   };
 
   return (
     <div className={styles.layoutContainer}>
+      {/* Liquid animated background */}
+      <div className={styles.liquidBg}>
+        <div className={`${styles.liquidBlob} ${styles.blob1}`} />
+        <div className={`${styles.liquidBlob} ${styles.blob2}`} />
+        <div className={`${styles.liquidBlob} ${styles.blob3}`} />
+        <div className={`${styles.liquidBlob} ${styles.blob4}`} />
+      </div>
+
       <Header />
       <div className={styles.contentContainer}>
         <Sidebar />
@@ -153,7 +161,7 @@ export default function Dashboard() {
           {recentBoards.length > 0 && (
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className={styles.sectionIcon}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className={styles.sectionIcon}>
                   <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
                 </svg>
                 <h2 className={styles.sectionTitle}>Recently viewed</h2>
@@ -177,7 +185,7 @@ export default function Dashboard() {
           {/* Most Popular Templates Section */}
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className={styles.sectionIcon}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className={styles.sectionIcon}>
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
               </svg>
               <h2 className={styles.sectionTitle}>Most popular templates</h2>
@@ -205,7 +213,7 @@ export default function Dashboard() {
           {/* Your Boards Section */}
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className={styles.sectionIcon}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className={styles.sectionIcon}>
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
               <h2 className={styles.sectionTitle}>Your boards</h2>
@@ -234,7 +242,7 @@ export default function Dashboard() {
                   }
                 }}
               >
-                <span>Create new board</span>
+                <span>+ Create new board</span>
               </button>
             </div>
           </section>

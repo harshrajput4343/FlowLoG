@@ -1,43 +1,103 @@
+/* ─── Layout ─── */
 .layoutContainer {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .contentContainer {
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
+/* ─── Liquid Background ─── */
+.liquidBg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.liquidBlob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.45;
+}
+
+.blob1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.5) 0%, transparent 70%);
+  top: -10%;
+  right: -5%;
+  animation: liquidFloat1 18s ease-in-out infinite;
+}
+
+.blob2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, transparent 70%);
+  bottom: -5%;
+  left: -8%;
+  animation: liquidFloat2 22s ease-in-out infinite;
+}
+
+.blob3 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.35) 0%, transparent 70%);
+  top: 40%;
+  left: 40%;
+  animation: liquidFloat3 20s ease-in-out infinite;
+}
+
+.blob4 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.3) 0%, transparent 70%);
+  top: 20%;
+  left: 15%;
+  animation: liquidFloat1 25s ease-in-out infinite reverse;
+}
+
+/* ─── Main Content ─── */
 .mainContent {
   flex: 1;
   overflow-y: auto;
   padding: 32px 40px;
-  background-color: var(--body-bg);
+  position: relative;
+  z-index: 1;
 }
 
-/* Workspace Header */
+/* ─── Workspace Header ─── */
 .workspaceHeader {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 36px;
   padding-bottom: 24px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--glass-border);
+  animation: fadeInUp 0.5s ease both;
 }
 
 .workspaceLogo {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #00c2e0 0%, #0079bf 100%);
-  border-radius: 8px;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 24px;
   color: white;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
 }
 
 .workspaceInfo {
@@ -48,134 +108,174 @@
 
 .workspaceName {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  letter-spacing: -0.3px;
 }
 
 .workspaceType {
-  font-size: 12px;
-  color: var(--text-secondary);
-  background: var(--hover-bg);
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-color);
+  background: var(--active-bg);
+  padding: 2px 10px;
+  border-radius: 20px;
   width: fit-content;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
-/* Sections */
+/* ─── Section Layout ─── */
 .section {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
+  animation: fadeInUp 0.5s ease both;
 }
+
+.section:nth-child(2) { animation-delay: 0.1s; }
+.section:nth-child(3) { animation-delay: 0.2s; }
+.section:nth-child(4) { animation-delay: 0.3s; }
 
 .sectionHeader {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
 .sectionIcon {
-  color: var(--text-secondary);
+  color: var(--accent-color);
+  opacity: 0.7;
 }
 
 .sectionTitle {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   margin: 0;
   flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .sectionDesc {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin: 0 0 16px 0;
+  opacity: 0.8;
 }
 
-/* Template Grid */
+/* ─── Template Grid ─── */
 .templateGrid {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   overflow-x: auto;
   padding-bottom: 8px;
 }
 
 .templateCard {
-  min-width: 180px;
-  height: 100px;
-  border-radius: 8px;
-  padding: 12px;
+  min-width: 200px;
+  height: 110px;
+  border-radius: 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.templateCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.3) 100%);
+  border-radius: 16px;
+  pointer-events: none;
 }
 
 .templateCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
 .templateLabel {
-  font-size: 10px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.2px;
+  position: relative;
+  z-index: 1;
 }
 
 .templateName {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: white;
+  position: relative;
+  z-index: 1;
 }
 
-/* Board Grid */
+/* ─── Board Grid — Glassmorphism Cards ─── */
 .boardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
-  max-width: 800px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  max-width: 900px;
 }
 
 .boardCard {
-  height: 100px;
-  border-radius: 4px;
-  padding: 12px;
+  height: 110px;
+  border-radius: 16px;
+  padding: 16px;
   position: relative;
   text-decoration: none;
   background-size: cover;
   background-position: center;
-  transition: all 0.15s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.boardCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.4) 100%);
+  border-radius: 16px;
+  pointer-events: none;
 }
 
 .boardCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
 .boardCardTitle {
   color: white;
   font-weight: 700;
-  font-size: 16px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  font-size: 15px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
 }
 
 .createBoardCard {
-  height: 100px;
-  background-color: var(--hover-bg);
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
+  height: 110px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 16px;
+  border: 1px dashed var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,49 +283,60 @@
   font-size: 14px;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.25s ease;
 }
 
 .createBoardCard:hover {
-  background-color: var(--active-bg);
-  color: var(--text-primary);
+  background: var(--glass-hover);
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: var(--glass-glow);
+  transform: translateY(-2px);
 }
 
-/* Template Modal */
+/* ─── Template Modal — Glass ─── */
 .templateModalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
 }
+
 .templateModal {
-  background: var(--modal-bg, #282e33);
-  border-radius: 12px;
+  background: var(--modal-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 20px;
   width: 100%;
-  max-width: 580px;
+  max-width: 560px;
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: modalIn 0.2s ease;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
 .templateModalClose {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.4);
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
   border: none;
   color: white;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   font-size: 18px;
   cursor: pointer;
@@ -234,41 +345,49 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  transition: background 0.15s ease;
 }
+
 .templateModalClose:hover {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
 }
+
 .templateModalPreview {
   height: 160px;
   display: flex;
   align-items: flex-end;
-  padding: 12px;
+  padding: 14px;
   overflow: hidden;
 }
+
 .templateModalLists {
   display: flex;
   gap: 8px;
   width: 100%;
 }
+
 .templateModalList {
   flex: 1;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
   padding: 8px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .templateModalListTitle {
   color: white;
   font-size: 10px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
 .templateModalCard {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 3px;
-  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  padding: 4px 7px;
   font-size: 10px;
   color: #172b4d;
   margin-bottom: 3px;
@@ -276,64 +395,75 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .templateModalContent {
   padding: 24px;
 }
+
 .templateModalTitle {
   font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 8px;
 }
+
 .templateModalDesc {
   font-size: 14px;
   color: var(--text-secondary);
   margin: 0 0 20px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
+
 .templateModalLabel {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
+
 .templateModalInput {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--input-border, var(--border-color));
-  border-radius: 6px;
-  background: var(--input-bg, var(--hover-bg));
+  padding: 11px 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
   color: var(--text-primary);
   font-size: 14px;
   margin-bottom: 16px;
   font-family: inherit;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
+
 .templateModalInput:focus {
   outline: none;
-  border-color: var(--accent-color, #579dff);
-  box-shadow: 0 0 0 2px rgba(87, 157, 255, 0.2);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
+
 .templateModalBtn {
   width: 100%;
   padding: 12px;
-  background: var(--accent-color, #579dff);
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: filter 0.15s, transform 0.1s;
+  transition: all 0.2s ease;
   font-family: inherit;
 }
+
 .templateModalBtn:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
 }
+
 .templateModalBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;

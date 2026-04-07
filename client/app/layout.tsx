@@ -2,6 +2,7 @@
 import { Inter, Poppins } from 'next/font/google';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ToastProvider } from '@/contexts/ToastContext';
+import { FlowBot } from '@/components/FlowBot';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -22,6 +23,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             {children}
+            <FlowBot />
           </ToastProvider>
         </ThemeProvider>
       </body>

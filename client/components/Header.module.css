@@ -1,13 +1,17 @@
 .mainHeader {
   height: 56px;
   background: var(--header-bg);
-  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
   color: var(--text-primary);
   gap: 16px;
+  position: relative;
+  z-index: 10;
 }
 
 .headerLeft {
@@ -20,38 +24,37 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   font-weight: 800;
   font-size: 22px;
   color: var(--text-primary);
   text-decoration: none;
   padding: 8px 12px;
-  border-radius: 8px;
-  transition: background 0.15s ease, transform 0.1s ease;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .logo:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-hover);
   transform: scale(1.02);
 }
 
 .logoFlow {
   font-family: var(--font-poppins), 'Poppins', sans-serif;
   font-weight: 700;
-  font-size: 32px;
-  background: linear-gradient(135deg, #4f8ef7 0%, #a855f7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 24px;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--logo-stroke);
   letter-spacing: -1px;
 }
 
 .logoLog {
   font-family: var(--font-poppins), 'Poppins', sans-serif;
   font-weight: 800;
-  font-size: 32px;
-  color: #22c55e;
-  letter-spacing: -1px;
+  font-size: 24px;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--logo-stroke);
+  letter-spacing: -0.5px;
 }
 
 .headerCenter {
@@ -70,13 +73,15 @@
 
 .headerSearchInput {
   width: 100%;
-  padding: 10px 14px 10px 40px;
-  border-radius: 8px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
+  padding: 9px 14px 9px 40px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text-primary);
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .headerSearchInput::placeholder {
@@ -86,7 +91,8 @@
 .headerSearchInput:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  background: var(--glass-hover);
 }
 
 .searchIcon {
@@ -101,7 +107,7 @@
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -115,23 +121,29 @@
   justify-content: center;
   color: var(--text-secondary);
   cursor: pointer;
-  border-radius: 50%;
-  transition: all 0.15s ease;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .headerIconBtn:hover {
-  background: var(--hover-bg);
+  background: var(--glass-hover);
   color: var(--text-primary);
 }
 
+/* Fix notification and info icons color to match mockup feedback */
+.headerIconBtn svg {
+  color: var(--logo-stroke);
+  opacity: 0.85;
+}
+
 .createBtn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   color: white;
   font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   border: none;
   cursor: pointer;
 }
@@ -139,13 +151,14 @@
 .createBtn:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
 }
 
 .avatar {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -153,11 +166,12 @@
   font-weight: 600;
   color: white;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .avatar:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 /* Search Dropdown */
@@ -166,9 +180,12 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #282e33;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: var(--dropdown-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   margin-top: 8px;
   padding: 8px 0;
   z-index: 1000;
@@ -177,11 +194,11 @@
 }
 
 .searchDropdownHeader {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: #9fadbc;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   padding: 10px 14px 6px;
 }
 
@@ -191,24 +208,42 @@
   gap: 12px;
   padding: 10px 14px;
   cursor: pointer;
-  color: #b6c2cf;
-  transition: background 0.1s;
+  color: var(--text-primary);
+  transition: background 0.15s;
+  border-radius: 8px;
+  margin: 0 4px;
 }
 
 .searchResultItem:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--glass-hover);
 }
 
 .searchResultIcon {
   width: 36px;
   height: 28px;
-  border-radius: 4px;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
 .noResults {
   padding: 20px;
-  color: #9fadbc;
+  color: var(--text-secondary);
   text-align: center;
   font-size: 14px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .headerCenter {
+    display: none; /* Hide search on mobile header to save space */
+  }
+
+  .logoFlow, .logoLog {
+    font-size: 20px;
+  }
+
+  .createBtn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 }
