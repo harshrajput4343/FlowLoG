@@ -39,21 +39,16 @@
   transform: scale(1.02);
 }
 
-.logoFlow {
-  font-family: var(--font-poppins), 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--logo-stroke);
-  letter-spacing: -1px;
+.logoIcon {
+  flex-shrink: 0;
+  display: block;
 }
 
-.logoLog {
+.logoText {
   font-family: var(--font-poppins), 'Poppins', sans-serif;
-  font-weight: 800;
-  font-size: 24px;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--logo-stroke);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
 }
 
@@ -91,7 +86,7 @@
 .headerSearchInput:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   background: var(--glass-hover);
 }
 
@@ -137,7 +132,7 @@
 }
 
 .createBtn {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   color: white;
   font-weight: 600;
   padding: 8px 18px;
@@ -151,13 +146,13 @@
 .createBtn:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
 }
 
 .avatar {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -171,7 +166,7 @@
 
 .avatar:hover {
   transform: scale(1.08);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 /* Search Dropdown */
@@ -238,8 +233,8 @@
     display: none; /* Hide search on mobile header to save space */
   }
 
-  .logoFlow, .logoLog {
-    font-size: 20px;
+  .logoText {
+    font-size: 18px;
   }
 
   .createBtn {

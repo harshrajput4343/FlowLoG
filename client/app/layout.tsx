@@ -18,6 +18,7 @@ export default function RootLayout({
       <head>
         <title>FlowLog</title>
         <meta name="description" content="FlowLog - Project management made simple with Next.js and Express" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={`${inter.className} ${poppins.variable}`}>
         <ThemeProvider>

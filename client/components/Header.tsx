@@ -127,8 +127,19 @@ export const Header = ({ onSearch }: Props) => {
       <header className={styles.mainHeader}>
         <div className={styles.headerLeft}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoFlow}>Flow</span>
-            <span className={styles.logoLog}>LoG</span>
+            <svg className={styles.logoIcon} width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="headerGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#2563eb" />
+                  <stop offset="50%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#10b981" />
+                </linearGradient>
+              </defs>
+              <rect x="6" y="4" width="6" height="24" rx="3" fill="url(#headerGrad)" />
+              <rect x="15" y="4" width="12" height="6" rx="3" fill="url(#headerGrad)" />
+              <rect x="15" y="13" width="8" height="6" rx="3" fill="url(#headerGrad)" />
+            </svg>
+            <span className={styles.logoText}>FlowLog</span>
           </Link>
         </div>
 
@@ -202,8 +213,9 @@ export const Header = ({ onSearch }: Props) => {
               title="Notifications"
               onClick={() => setShowNotifications(!showNotifications)}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
             </button>
             {showNotifications && (
@@ -212,8 +224,10 @@ export const Header = ({ onSearch }: Props) => {
           </div>
 
           <button className={styles.headerIconBtn} title="Information">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
             </svg>
           </button>
 

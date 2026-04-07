@@ -33,7 +33,7 @@
 .blob1 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.5) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.5) 0%, transparent 70%);
   top: -10%;
   right: -5%;
   animation: liquidFloat1 18s ease-in-out infinite;
@@ -42,7 +42,7 @@
 .blob2 {
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%);
   bottom: -5%;
   left: -8%;
   animation: liquidFloat2 22s ease-in-out infinite;
@@ -89,7 +89,7 @@
 .workspaceLogo {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -97,7 +97,7 @@
   font-weight: 700;
   font-size: 24px;
   color: white;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
 }
 
 .workspaceInfo {
@@ -441,13 +441,13 @@
 .templateModalInput:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .templateModalBtn {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -461,7 +461,7 @@
 .templateModalBtn:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
 }
 
 .templateModalBtn:disabled {

@@ -48,6 +48,13 @@ export default function SettingsPage() {
 
   return (
     <div className={styles.layoutContainer}>
+      {/* Liquid animated background */}
+      <div className={styles.liquidBg}>
+        <div className={`${styles.liquidBlob} ${styles.blob1}`} />
+        <div className={`${styles.liquidBlob} ${styles.blob2}`} />
+        <div className={`${styles.liquidBlob} ${styles.blob3}`} />
+        <div className={`${styles.liquidBlob} ${styles.blob4}`} />
+      </div>
       <Header />
       <div className={styles.contentContainer}>
         <Sidebar />

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="fGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <!-- Flawless geometric 'F' created from 3 sleek rounded capsules -->
+  <rect x="6" y="4" width="6" height="24" rx="3" fill="url(#fGrad)" />
+  <rect x="15" y="4" width="12" height="6" rx="3" fill="url(#fGrad)" />
+  <rect x="15" y="13" width="8" height="6" rx="3" fill="url(#fGrad)" />
+</svg>
