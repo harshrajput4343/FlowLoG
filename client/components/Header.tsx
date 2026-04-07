@@ -6,6 +6,7 @@ import { ProfileDropdown } from './ProfileDropdown';
 import { CreateBoardModal } from './CreateBoardModal';
 import { NotificationPopup } from './NotificationPopup';
 import { apiClient } from '@/utils/api';
+import { useSidebar } from '@/contexts/SidebarContext';
 import styles from './Header.module.css';
 
 interface Board {
@@ -14,12 +15,12 @@ interface Board {
   background?: string;
 }
 
-interface Props {
+interface HeaderProps {
   onSearch?: (query: string) => void;
-  onToggleSidebar?: () => void;
 }
 
-export const Header = ({ onSearch, onToggleSidebar }: Props) => {
+export const Header = ({ onSearch }: HeaderProps) => {
+  const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -131,7 +132,7 @@ export const Header = ({ onSearch, onToggleSidebar }: Props) => {
           {/* Hamburger menu — visible only on mobile via CSS */}
           <button
             className={styles.hamburgerBtn}
-            onClick={onToggleSidebar}
+            onClick={toggleSidebar}
             aria-label="Toggle menu"
           >
             <span className={styles.hamburgerLine} />
@@ -217,6 +218,58 @@ export const Header = ({ onSearch, onToggleSidebar }: Props) => {
               <path d="M21 21l-4.35-4.35" />
             </svg>
           </button>
+
+          {/* Mobile Search Input Overlay */}
+          {mobileSearchOpen && (
+            <div className={styles.mobileSearchOverlay}>
+              <div className={styles.mobileSearchWrapper}>
+                <input
+                  type="text"
+                  placeholder="Search boards..."
+                  className={styles.mobileSearchInput}
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  autoFocus
+                />
+                <button
+                  className={styles.mobileSearchClose}
+                  onClick={() => setMobileSearchOpen(false)}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Mobile Search Results */}
+              {showSearchResults && (
+                <div className={styles.mobileSearchResults}>
+                  {searchResults.length > 0 ? (
+                    searchResults.map(board => (
+                      <div
+                        key={board.id}
+                        className={styles.mobileSearchResultItem}
+                        onClick={() => handleBoardClick(board.id)}
+                      >
+                        <div
+                          className={styles.searchResultIcon}
+                          style={{
+                            background: board.background?.startsWith('#')
+                              ? board.background
+                              : 'linear-gradient(135deg, #0079bf 0%, #5067c5 100%)'
+                          }}
+                        />
+                        <span>{board.title}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className={styles.noResults}>No matches for "{searchQuery}"</div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <button
             className={styles.createBtn}

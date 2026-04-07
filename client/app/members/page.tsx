@@ -57,8 +57,12 @@ export default function MembersPage() {
     }).catch(() => {});
   }, []);
 
-  // Filter members by search
+  // Filter members by search and exclude demo user
   const filteredMembers = members.filter(m => {
+    // 1) Remove demo user
+    if (m.email === 'demo@example.com') return false;
+    
+    // 2) Filter by search
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return m.name?.toLowerCase().includes(q) || m.email?.toLowerCase().includes(q);

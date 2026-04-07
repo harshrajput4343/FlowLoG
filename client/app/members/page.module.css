@@ -189,28 +189,38 @@
 /* Invite Form */
 .inviteForm {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--glass-bg-solid);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--glass-shadow);
 }
 
 .emailInput {
   flex: 1;
-  padding: 8px 12px;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  padding: 10px 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
   color: var(--text-primary);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .emailInput:focus {
   border-color: var(--accent-blue);
+  background: var(--glass-hover);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
 .emailInput::placeholder {
   color: var(--text-secondary);
+  opacity: 0.6;
 }
 
 .sendBtn {
@@ -686,8 +696,8 @@
   to { transform: scale(1); opacity: 1; }
 }
 
-/* ─── Tablet Breakpoint (≤1024px) ─── */
-@media (max-width: 1024px) {
+/* ─── Tablet/Medium Screen Breakpoint (≤1280px) ─── */
+@media (max-width: 1280px) {
   .mainContent {
     padding: 24px;
   }
@@ -739,7 +749,9 @@
   
   .pendingActions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start; /* Moved to left for mobile */
+    gap: 8px;
+    margin-top: 4px;
   }
 
   .memberRow {

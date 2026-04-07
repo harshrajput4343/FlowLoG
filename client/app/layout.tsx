@@ -2,6 +2,7 @@
 import { Inter, Poppins } from 'next/font/google';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ToastProvider } from '@/contexts/ToastContext';
+import { SidebarProvider } from '@/contexts/SidebarContext';
 import { FlowBot } from '@/components/FlowBot';
 import './globals.css';
 
@@ -27,8 +28,10 @@ export default function RootLayout({
       <body className={`${inter.className} ${poppins.variable}`}>
         <ThemeProvider>
           <ToastProvider>
-            {children}
-            <FlowBot />
+            <SidebarProvider>
+              {children}
+              <FlowBot />
+            </SidebarProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

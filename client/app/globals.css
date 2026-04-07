@@ -8,6 +8,7 @@
   --card-bg: #22272b;
   --header-bg: rgba(15, 15, 26, 0.72);
   --sidebar-bg: rgba(15, 15, 26, 0.6);
+  --sidebar-bg-solid: #15151a;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --accent-color: #60a5fa;
@@ -43,6 +44,7 @@
   --card-bg: #ffffff;
   --header-bg: rgba(255, 255, 255, 0.72);
   --sidebar-bg: rgba(248, 250, 252, 0.6);
+  --sidebar-bg-solid: #f8fafc;
   --text-primary: #000000;
   --text-secondary: #64748b;
   --accent-color: #2563eb;
@@ -191,8 +193,8 @@ a {
   }
 }
 
-/* Tablet adjustments */
-@media (max-width: 1024px) {
+/* Tablet/Medium Screen Breakpoint (≤1280px) */
+@media (max-width: 1280px) {
   body {
     overflow: auto;
   }

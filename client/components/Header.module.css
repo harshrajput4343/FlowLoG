@@ -277,8 +277,8 @@
   color: var(--text-primary);
 }
 
-/* ─── Tablet Breakpoint (≤1024px) ─── */
-@media (max-width: 1024px) {
+/* ─── Tablet/Medium Screen Breakpoint (≤1280px) ─── */
+@media (max-width: 1280px) {
   .hamburgerBtn {
     display: flex;
   }
@@ -314,12 +314,12 @@
   }
 
   .logoText {
-    font-size: 18px;
+    display: none;
   }
 
   .logoIcon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
 
   .createBtn {
@@ -346,6 +346,86 @@
     top: 56px;
     border-radius: 12px;
   }
+
+  /* Hide non-critical buttons on small screens to save space */
+  .headerIconBtn[title="Information"] {
+    display: none;
+  }
+  
+  .mobileSearchOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: var(--modal-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 1000;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .mobileSearchWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2px 12px;
+    margin-bottom: 12px;
+  }
+
+  .mobileSearchInput {
+    flex: 1;
+    height: 44px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+  }
+
+  .mobileSearchClose {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .mobileSearchResults {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobileSearchResultItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--glass-bg);
+    border-radius: 10px;
+    color: var(--text-primary);
+    transition: background 0.2s ease;
+  }
+
+  .mobileSearchResultItem:active {
+    background: var(--glass-hover);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ─── Small Phone (≤320px) ─── */

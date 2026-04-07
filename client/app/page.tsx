@@ -60,9 +60,6 @@ export default function Dashboard() {
   const [selectedTemplate, setSelectedTemplate] = useState<typeof HOME_TEMPLATES[0] | null>(null);
   const [templateBoardTitle, setTemplateBoardTitle] = useState('');
   const [creatingFromTemplate, setCreatingFromTemplate] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   useEffect(() => {
     // 1) Instantly paint boards from localStorage so the grid is never empty
@@ -148,14 +145,9 @@ export default function Dashboard() {
         <div className={`${styles.liquidBlob} ${styles.blob4}`} />
       </div>
 
-      <Header onToggleSidebar={toggleSidebar} />
+      <Header />
       <div className={styles.contentContainer}>
-        {/* Mobile sidebar backdrop */}
-        <div
-          className={`${sidebarStyles.sidebarBackdrop} ${sidebarOpen ? sidebarStyles.visible : ''}`}
-          onClick={() => setSidebarOpen(false)}
-        />
-        <Sidebar isOpen={sidebarOpen} />
+        <Sidebar />
         <main className={styles.mainContent}>
           {/* Workspace Header */}
           <div className={styles.workspaceHeader}>

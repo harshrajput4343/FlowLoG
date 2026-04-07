@@ -2,9 +2,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useSidebar } from '@/contexts/SidebarContext';
 import styles from './Sidebar.module.css';
 
-export const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
+export const Sidebar = () => {
+  const { isOpen, closeSidebar } = useSidebar();
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
@@ -28,7 +30,21 @@ export const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
   }, []);
 
   return (
-    <nav className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+    <>
+      {/* Mobile sidebar backdrop — using global context */}
+      <div
+        className={`${styles.sidebarBackdrop} ${isOpen ? styles.visible : ''}`}
+        onClick={closeSidebar}
+      />
+      <nav className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+        {/* Mobile Close Button */}
+        <button className={styles.mobileCloseBtn} onClick={closeSidebar} aria-label="Close menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
       {/* Main Navigation */}
       <div className={styles.navSection}>
         <Link href="/" className={`${styles.navItem} ${pathname === '/' || pathname === '/boards' ? styles.active : ''}`}>
@@ -114,6 +130,7 @@ export const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
           <div className={styles.upgradeIcon}>💎</div>
         </Link>
       )}
-    </nav>
+      </nav>
+    </>
   );
 };
