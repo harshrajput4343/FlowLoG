@@ -217,3 +217,58 @@
   font-size: 14px;
   padding: 16px;
 }
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .popup {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+    max-height: 80vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .searchContainer input {
+    font-size: 15px;
+    padding: 4px 0;
+  }
+  
+  .iconBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .filterTab {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .boardGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .boardPreview {
+    height: 70px;
+  }
+
+  .workspaceHeader {
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  .boardListItem {
+    padding: 10px 8px;
+  }
+  
+  .boardListPreview {
+    width: 48px;
+    height: 36px;
+  }
+  
+  .boardListTitle {
+    font-size: 15px;
+  }
+}

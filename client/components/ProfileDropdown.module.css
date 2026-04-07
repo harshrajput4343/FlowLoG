@@ -183,3 +183,27 @@
   background: rgba(248, 113, 104, 0.1);
   color: #f87168;
 }
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 320px;
+    z-index: 1010;
+  }
+
+  .menuItem {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  .avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+}

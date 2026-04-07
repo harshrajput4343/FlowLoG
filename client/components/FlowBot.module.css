@@ -297,3 +297,35 @@
   0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
   40% { transform: scale(1); opacity: 1; }
 }
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .botFab {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+  }
+
+  .chatWindow {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-height: none;
+    border-radius: 0;
+    z-index: 901;
+  }
+
+  .chatMessages {
+    max-height: none;
+  }
+
+  .chatInputRow {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .msgBot, .msgUser {
+    max-width: 92%;
+    font-size: 14.5px;
+  }
+}

@@ -18,6 +18,10 @@ export default function RootLayout({
       <head>
         <title>FlowLog</title>
         <meta name="description" content="FlowLog - Project management made simple with Next.js and Express" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#0a0a14" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className={`${inter.className} ${poppins.variable}`}>

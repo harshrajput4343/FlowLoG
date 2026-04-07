@@ -16,9 +16,10 @@ interface Board {
 
 interface Props {
   onSearch?: (query: string) => void;
+  onToggleSidebar?: () => void;
 }
 
-export const Header = ({ onSearch }: Props) => {
+export const Header = ({ onSearch, onToggleSidebar }: Props) => {
   const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -27,6 +28,7 @@ export const Header = ({ onSearch }: Props) => {
   const [searchResults, setSearchResults] = useState<Board[]>([]);
   const [allBoards, setAllBoards] = useState<Board[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -126,6 +128,17 @@ export const Header = ({ onSearch }: Props) => {
     <>
       <header className={styles.mainHeader}>
         <div className={styles.headerLeft}>
+          {/* Hamburger menu — visible only on mobile via CSS */}
+          <button
+            className={styles.hamburgerBtn}
+            onClick={onToggleSidebar}
+            aria-label="Toggle menu"
+          >
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+          </button>
+
           <Link href="/" className={styles.logo}>
             <svg className={styles.logoIcon} width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -193,6 +206,18 @@ export const Header = ({ onSearch }: Props) => {
         </div>
 
         <div className={styles.headerRight}>
+          {/* Mobile search toggle — visible only on mobile via CSS */}
+          <button
+            className={styles.mobileSearchBtn}
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            aria-label="Search"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+          </button>
+
           <button
             className={styles.createBtn}
             onClick={() => {

@@ -173,7 +173,8 @@
 
 .description, .inviteDesc {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  opacity: 0.8;
   line-height: 1.5;
   margin: 0 0 16px;
 }
@@ -683,4 +684,86 @@
 @keyframes scaleIn {
   from { transform: scale(0.95); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Tablet Breakpoint (≤1024px) ─── */
+@media (max-width: 1024px) {
+  .mainContent {
+    padding: 24px;
+  }
+  
+  .rightPanel {
+    width: 200px;
+  }
+}
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 16px;
+  }
+
+  .pageHeader {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .membersLayout {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .rightPanel {
+    width: 100%;
+    order: -1; /* Move right panel (invite actions) above member list */
+  }
+
+  .inviteForm {
+    flex-direction: column;
+  }
+
+  .emailInput {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .sendBtn {
+    padding: 10px 16px;
+  }
+
+  .pendingItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .pendingActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .memberRow {
+    flex-wrap: wrap;
+  }
+
+  .roleBadge, .removeBtn {
+    margin-top: 8px;
+  }
+
+  .toggleRow {
+    padding: 12px;
+  }
+  
+  .linkInput {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  
+  .copyBtn {
+    padding: 10px 16px;
+  }
+  
+  .modalContent {
+    padding: 20px;
+  }
 }

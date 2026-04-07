@@ -242,3 +242,57 @@
   font-size: 20px;
   padding: 0 8px;
 }
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .column {
+    min-width: calc(85vw - 24px);
+    width: calc(85vw - 24px);
+    scroll-snap-align: center;
+  }
+
+  .header {
+    padding: 12px;
+  }
+
+  /* Bigger tap targets */
+  .title {
+    font-size: 15px;
+    padding: 6px 12px;
+  }
+
+  .menuBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .menuDropdown {
+    width: 240px;
+  }
+
+  .menuItem {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .addCardBtn {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .addCardForm textarea {
+    font-size: 15px;
+  }
+
+  .addCardActions button:first-child {
+    padding: 8px 16px;
+  }
+}
+
+/* ─── Small Phone (≤320px) ─── */
+@media (max-width: 320px) {
+  .column {
+    min-width: 260px;
+    width: 260px;
+  }
+}

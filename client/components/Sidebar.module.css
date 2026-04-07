@@ -208,3 +208,83 @@
   border-radius: 10px;
   letter-spacing: 0.5px;
 }
+
+/* ─── Mobile Sidebar Drawer ─── */
+
+/* Backdrop overlay behind mobile drawer */
+.sidebarBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebarBackdrop.visible {
+  display: block;
+  opacity: 1;
+}
+
+/* ─── Tablet Breakpoint (≤1024px) ─── */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding-top: 60px;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebarBackdrop {
+    display: none;
+  }
+
+  .sidebarBackdrop.visible {
+    display: block;
+    opacity: 1;
+  }
+}
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 280px;
+    padding-top: 56px;
+  }
+
+  .navItem {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .workspaceSubItem {
+    padding: 10px 16px 10px 48px;
+    font-size: 15px;
+  }
+
+  .workspaceItem {
+    padding: 10px 16px;
+  }
+
+  .upgradeBanner {
+    margin: auto 12px 16px;
+  }
+}
+
+/* ─── Small Phone (≤320px) ─── */
+@media (max-width: 320px) {
+  .sidebar {
+    width: 260px;
+  }
+}

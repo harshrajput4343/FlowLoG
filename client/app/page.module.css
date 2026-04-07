@@ -469,3 +469,181 @@
   cursor: not-allowed;
   transform: none;
 }
+
+/* ─── Tablet Breakpoint (≤1024px) ─── */
+@media (max-width: 1024px) {
+  .mainContent {
+    padding: 24px 28px;
+  }
+
+  .boardGrid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+
+  /* Reduce blob sizes for performance */
+  .blob1 { width: 350px; height: 350px; }
+  .blob2 { width: 300px; height: 300px; }
+  .blob3 { width: 250px; height: 250px; }
+  .blob4 { width: 200px; height: 200px; }
+}
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .mainContent {
+    padding: 16px;
+  }
+
+  /* Workspace header */
+  .workspaceHeader {
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+
+  .workspaceLogo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 18px;
+  }
+
+  .workspaceName {
+    font-size: 17px;
+  }
+
+  /* Board grid — 2 columns on phones */
+  .boardGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .boardCard {
+    height: 100px;
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .boardCardTitle {
+    font-size: 13px;
+  }
+
+  .createBoardCard {
+    height: 100px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  /* Template grid — 2 columns on phones */
+  .templateGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding-bottom: 0;
+    overflow-x: visible; /* Remove horizontal scroll */
+  }
+
+  .templateCard {
+    min-width: 0; /* Reset from 170px */
+    width: 100%;
+    height: 100px;
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .templateName {
+    font-size: 13px;
+    white-space: normal; /* Better wrapping */
+  }
+
+  /* Section titles */
+  .sectionTitle {
+    font-size: 12px;
+  }
+
+  .sectionDesc {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  /* Template modal — full-width on mobile */
+  .templateModalOverlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .templateModal {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .templateModalPreview {
+    height: 120px;
+  }
+
+  .templateModalContent {
+    padding: 20px 16px;
+  }
+
+  .templateModalTitle {
+    font-size: 18px;
+  }
+
+  .templateModalLists {
+    gap: 6px;
+  }
+
+  .templateModalList {
+    padding: 6px;
+  }
+
+  /* Smaller blobs for GPU savings */
+  .blob1 { width: 250px; height: 250px; }
+  .blob2 { width: 200px; height: 200px; }
+  .blob3 { width: 180px; height: 180px; opacity: 0.3; }
+  .blob4 { display: none; }
+}
+
+/* ─── Small Phone (≤320px) ─── */
+@media (max-width: 320px) {
+  .mainContent {
+    padding: 12px;
+  }
+
+  .boardGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .boardCard {
+    height: 85px;
+    padding: 10px;
+  }
+
+  .boardCardTitle {
+    font-size: 12px;
+  }
+
+  .workspaceName {
+    font-size: 15px;
+  }
+
+  .templateCard {
+    min-width: 150px;
+    height: 85px;
+  }
+
+  .templateModalOverlay {
+    padding: 0;
+  }
+
+  .templateModal {
+    border-radius: 12px 12px 0 0;
+  }
+}

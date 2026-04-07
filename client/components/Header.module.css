@@ -227,18 +227,145 @@
   font-size: 14px;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* ─── Hamburger Button (hidden on desktop) ─── */
+.hamburgerBtn {
+  display: none;
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.hamburgerBtn:hover {
+  background: var(--glass-hover);
+}
+
+.hamburgerLine {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile Search Button (hidden on desktop) */
+.mobileSearchBtn {
+  display: none;
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.mobileSearchBtn:hover {
+  background: var(--glass-hover);
+  color: var(--text-primary);
+}
+
+/* ─── Tablet Breakpoint (≤1024px) ─── */
+@media (max-width: 1024px) {
+  .hamburgerBtn {
+    display: flex;
+  }
+
   .headerCenter {
-    display: none; /* Hide search on mobile header to save space */
+    max-width: 280px;
+  }
+}
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .mainHeader {
+    height: 52px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .hamburgerBtn {
+    display: flex;
+  }
+
+  .mobileSearchBtn {
+    display: flex;
+  }
+
+  .headerCenter {
+    display: none;
+  }
+
+  .logo {
+    padding: 6px 8px;
+    gap: 4px;
   }
 
   .logoText {
     font-size: 18px;
   }
 
+  .logoIcon {
+    width: 24px;
+    height: 24px;
+  }
+
   .createBtn {
-    padding: 6px 12px;
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .headerIconBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  .searchDropdown {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: 56px;
+    border-radius: 12px;
+  }
+}
+
+/* ─── Small Phone (≤320px) ─── */
+@media (max-width: 320px) {
+  .mainHeader {
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .logoText {
+    font-size: 16px;
+  }
+
+  .createBtn {
+    padding: 5px 10px;
     font-size: 12px;
+  }
+
+  /* Hide info button to save space */
+  .headerIconBtn:nth-child(2) {
+    display: none;
   }
 }

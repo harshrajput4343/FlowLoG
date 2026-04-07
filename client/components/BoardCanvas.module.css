@@ -712,3 +712,133 @@
   border-radius: 6px;
   background: var(--hover-bg, rgba(255,255,255,0.06));
 }
+
+/* ─── Tablet Breakpoint (≤1024px) ─── */
+@media (max-width: 1024px) {
+  .boardHeader {
+    padding: 12px 16px;
+  }
+}
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .canvasContainer {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Header adjustments */
+  .boardHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .headerLeft {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .headerTitle {
+    font-size: 18px;
+  }
+
+  .headerRight {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    justify-content: flex-start;
+  }
+
+  /* Hide less important buttons on mobile */
+  .headerIconBtn[title="Share"],
+  .headerIconBtn[title="Filter"],
+  .liveDate {
+    display: none;
+  }
+
+  /* List Container smooth scrolling */
+  .listsContainer {
+    padding: 12px;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 12px;
+  }
+
+  .addListBtn {
+    min-width: 280px;
+    width: 280px;
+    scroll-snap-align: start;
+    padding: 12px 16px;
+  }
+
+  /* Analytics View */
+  .analyticsContainer {
+    padding: 16px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Bottom Nav additions */
+  .bottomNav {
+    padding: 8px 16px env(safe-area-inset-bottom, 8px);
+  }
+
+  .navItem {
+    gap: 2px;
+  }
+
+  .navItem svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navItem span {
+    font-size: 10px;
+  }
+
+  /* Board Menu */
+  .boardMenu {
+    width: 100%;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    height: 80vh;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .boardMenu.open {
+    transform: translateY(0);
+  }
+
+  /* Background Panel */
+  .bgPanel {
+    width: 100%;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    height: 80vh;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+  }
+
+  .bgPanel.open {
+    transform: translateY(0);
+  }
+}
+
+/* ─── Small Phone (≤320px) ─── */
+@media (max-width: 320px) {
+  .addListBtn {
+    min-width: 260px;
+    width: 260px;
+  }
+}

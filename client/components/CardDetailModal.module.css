@@ -657,3 +657,88 @@
 .saveBtn:hover {
   background: #85b8ff;
 }
+
+/* ─── Mobile Breakpoint (≤768px) ─── */
+@media (max-width: 768px) {
+  .overlay {
+    padding-top: 0;
+    align-items: flex-start;
+  }
+
+  .modal {
+    width: 100%;
+    margin-bottom: 0;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .cover {
+    height: 120px;
+  }
+
+  .header {
+    padding: 16px;
+  }
+
+  .titleIcon {
+    top: 16px;
+  }
+
+  .headerContent {
+    padding-right: 48px;
+  }
+
+  .closeBtn {
+    width: 40px;
+    height: 40px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .mainContainer {
+    flex-direction: column;
+    padding: 16px;
+    gap: 24px;
+  }
+
+  .mainContent {
+    padding-left: 28px;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .sidebarBtn {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  .sidebarSection h4 {
+    font-size: 13px;
+  }
+
+  .sectionIcon {
+    left: -28px;
+  }
+
+  /* Full width popup menus on mobile */
+  .popupMenu {
+    position: fixed;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1050;
+  }
+
+  .descEditor, .activityInput {
+    font-size: 15px;
+  }
+}

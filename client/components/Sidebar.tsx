@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import styles from './Sidebar.module.css';
 
-export const Sidebar = () => {
+export const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
@@ -28,7 +28,7 @@ export const Sidebar = () => {
   }, []);
 
   return (
-    <nav className={styles.sidebar}>
+    <nav className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
       {/* Main Navigation */}
       <div className={styles.navSection}>
         <Link href="/" className={`${styles.navItem} ${pathname === '/' || pathname === '/boards' ? styles.active : ''}`}>
