@@ -8,7 +8,6 @@ import { CardDetailModal } from './CardDetailModal';
 import { SwitchBoardsPopup } from './SwitchBoardsPopup';
 import { apiClient } from '@/utils/api';
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
 import { FilterPopup } from './FilterPopup';
 import { isPremiumUser } from '@/utils/premiumGate';
 import styles from './BoardCanvas.module.css';
@@ -566,7 +565,6 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
   return (
     <div className={styles.pageWrapper} style={backgroundStyle}>
       <Header onSearch={setSearchQuery} />
-      <Sidebar />
 
       {/* Board Title Bar */}
       <DragDropContext onDragEnd={onDragEnd}>

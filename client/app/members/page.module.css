@@ -93,20 +93,22 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: var(--accent-blue);
-  color: #fff;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .inviteBtn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
 }
 
 /* Tabs */
@@ -133,7 +135,8 @@
 }
 
 .activeTab {
-  color: var(--accent-blue);
+  color: #3b82f6; /* Vibrant brand blue for dark mode */
+  font-weight: 700;
 }
 
 .activeTab::after {
@@ -142,9 +145,9 @@
   bottom: -1px;
   left: 0;
   right: 0;
-  height: 2px;
-  background: var(--accent-blue);
-  border-radius: 1px;
+  height: 3px;
+  background: #3b82f6;
+  border-radius: 2px 2px 0 0;
 }
 
 /* Members Layout */
@@ -224,25 +227,31 @@
 }
 
 .sendBtn {
-  padding: 8px 16px;
-  background: var(--accent-blue);
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 .sendBtn:hover:not(:disabled) {
-  opacity: 0.9;
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
 }
 
 .sendBtn:disabled {
+  background: var(--hover-bg);
+  color: var(--text-secondary);
   opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Pending Invitations */
