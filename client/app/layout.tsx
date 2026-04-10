@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { FlowBot } from '@/components/FlowBot';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -31,6 +32,7 @@ export default function RootLayout({
             <SidebarProvider>
               {children}
               <FlowBot />
+              <Analytics />
             </SidebarProvider>
           </ToastProvider>
         </ThemeProvider>
