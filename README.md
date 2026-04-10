@@ -524,7 +524,7 @@ FlowLoG is deployed using a **3-tier cloud architecture**:
 
 ## 📸 Screenshots
 
-<p align="center"><em>Coming soon — screenshots of the FlowLoG dashboard, board view, card detail modal, and mobile responsive views.</em></p>
+<p align="center"><em>Go to Live link: [https://flowlogwork.vercel.app] — screenshots of the FlowLoG dashboard, board view, card detail modal, and mobile responsive views.</em></p>
 
 <!-- 
 Uncomment and add your screenshots:
