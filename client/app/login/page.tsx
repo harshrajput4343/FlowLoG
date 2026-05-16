@@ -37,7 +37,7 @@ export default function LoginPage() {
       // Store token and user info
       localStorage.setItem('authToken', data.token || 'logged-in');
       localStorage.setItem('user', JSON.stringify(data.user || { email }));
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
     } finally {
@@ -49,7 +49,7 @@ export default function LoginPage() {
   const handleGuestLogin = () => {
     localStorage.setItem('authToken', 'guest-token');
     localStorage.setItem('user', JSON.stringify({ name: 'Guest', email: 'guest@flowlog.app' }));
-    router.push('/');
+    router.push('/dashboard');
   };
 
   return (

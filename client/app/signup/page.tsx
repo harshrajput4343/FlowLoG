@@ -41,7 +41,7 @@ export default function SignupPage() {
       const data = await res.json();
       localStorage.setItem('authToken', data.token || 'logged-in');
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {

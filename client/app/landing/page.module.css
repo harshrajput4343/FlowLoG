@@ -1,0 +1,145 @@
+/* Landing Page — Agile Clarity Design System */
+.landing{font-family:'Inter',sans-serif;background:#f8f9fb;color:#191c1e;overflow-x:hidden}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(248,249,251,.85);backdrop-filter:blur(16px);border-bottom:1px solid #c3c6d6}
+.navLogo{font-size:22px;font-weight:700;color:#003d9b;letter-spacing:-.02em;text-decoration:none}
+.navLogo span{color:#0052cc}
+.navLinks{display:flex;gap:32px;align-items:center}
+.navLink{font-size:14px;font-weight:500;color:#42526E;text-decoration:none;transition:color .2s}
+.navLink:hover{color:#0052cc}
+.navCta{display:inline-flex;align-items:center;padding:10px 24px;background:#0052cc;color:#fff;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;transition:all .2s;border:none;cursor:pointer}
+.navCta:hover{background:#003d9b;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,82,204,.3)}
+.navSecondary{padding:10px 24px;background:transparent;color:#0052cc;border:1px solid #c3c6d6;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;transition:all .2s;cursor:pointer}
+.navSecondary:hover{border-color:#0052cc;background:rgba(0,82,204,.05)}
+.mobileMenu{display:none;background:none;border:none;cursor:pointer;padding:8px}
+
+/* Hero */
+.hero{padding:160px 40px 80px;text-align:center;max-width:1280px;margin:0 auto;position:relative}
+.heroBadge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:#dae2ff;color:#003d9b;border-radius:9999px;font-size:12px;font-weight:600;margin-bottom:24px;letter-spacing:.3px}
+.heroTitle{font-size:48px;font-weight:700;line-height:60px;letter-spacing:-.02em;color:#172B4D;margin:0 0 20px;max-width:800px;margin-left:auto;margin-right:auto}
+.heroTitle span{color:#0052cc}
+.heroSub{font-size:18px;line-height:28px;color:#42526E;max-width:600px;margin:0 auto 40px}
+.heroCtas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.heroCtaPrimary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#0052cc;color:#fff;border-radius:8px;font-size:16px;font-weight:600;text-decoration:none;transition:all .25s;border:none;cursor:pointer}
+.heroCtaPrimary:hover{background:#003d9b;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,82,204,.35)}
+.heroCtaSecondary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#fff;color:#42526E;border:1px solid #c3c6d6;border-radius:8px;font-size:16px;font-weight:600;text-decoration:none;transition:all .25s;cursor:pointer}
+.heroCtaSecondary:hover{border-color:#0052cc;color:#0052cc;transform:translateY(-2px)}
+.heroPreview{margin-top:64px;border-radius:16px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.12);border:1px solid #c3c6d6;background:#fff}
+.heroPreviewInner{display:flex;gap:16px;padding:24px;overflow-x:auto}
+.previewCol{min-width:220px;flex:1;background:#f3f4f6;border-radius:8px;padding:12px}
+.previewColTitle{font-size:12px;font-weight:600;color:#172B4D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.previewCard{background:#fff;border:1px solid #DFE1E6;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:13px;color:#42526E;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.previewChip{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:600;margin-top:6px}
+
+/* Features */
+.features{padding:80px 40px;max-width:1280px;margin:0 auto}
+.sectionLabel{font-size:12px;font-weight:600;color:#0052cc;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;text-align:center}
+.sectionTitle{font-size:32px;font-weight:700;line-height:40px;color:#172B4D;text-align:center;margin:0 0 12px;letter-spacing:-.01em}
+.sectionSub{font-size:16px;color:#42526E;text-align:center;max-width:600px;margin:0 auto 48px;line-height:24px}
+.featureGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.featureCard{background:#fff;border:1px solid #c3c6d6;border-radius:12px;padding:32px 24px;transition:all .3s;position:relative;overflow:hidden}
+.featureCard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:#b2c5ff}
+.featureIcon{width:48px;height:48px;background:#dae2ff;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:22px}
+.featureCardTitle{font-size:20px;font-weight:600;color:#172B4D;margin:0 0 8px;line-height:28px}
+.featureCardDesc{font-size:14px;color:#42526E;line-height:22px;margin:0}
+
+/* AI Section */
+.aiSection{padding:80px 40px;background:#f3f4f6}
+.aiContainer{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.aiContent h2{font-size:32px;font-weight:700;color:#172B4D;margin:0 0 16px;line-height:40px;letter-spacing:-.01em}
+.aiContent p{font-size:16px;color:#42526E;line-height:26px;margin:0 0 24px}
+.aiChips{display:flex;flex-wrap:wrap;gap:10px}
+.aiChip{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#dae2ff;color:#003d9b;border-radius:9999px;font-size:13px;font-weight:500}
+.aiMockup{background:#fff;border-radius:12px;border:1px solid #c3c6d6;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.aiMsg{padding:12px 16px;border-radius:12px;margin-bottom:12px;font-size:14px;line-height:22px;max-width:85%}
+.aiMsgUser{background:#0052cc;color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.aiMsgBot{background:#f3f4f6;color:#42526E;border-bottom-left-radius:4px}
+
+/* Teams */
+.teams{padding:80px 40px;max-width:1280px;margin:0 auto}
+.teamGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.teamCard{background:#fff;border:1px solid #c3c6d6;border-radius:12px;padding:28px 20px;text-align:center;transition:all .3s}
+.teamCard:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.teamEmoji{font-size:32px;margin-bottom:12px}
+.teamCardTitle{font-size:16px;font-weight:600;color:#172B4D;margin:0 0 6px}
+.teamCardDesc{font-size:13px;color:#42526E;line-height:20px;margin:0}
+
+/* Pricing */
+.pricing{padding:80px 40px;background:#f3f4f6}
+.pricingContainer{max-width:800px;margin:0 auto}
+.pricingGrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.pricingCard{background:#fff;border:1px solid #c3c6d6;border-radius:16px;padding:36px 28px;position:relative;transition:all .3s}
+.pricingCard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.08)}
+.pricingPopular{border-color:#0052cc;box-shadow:0 4px 16px rgba(0,82,204,.15)}
+.pricingBadge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#0052cc;color:#fff;padding:4px 16px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.5px}
+.pricingPlan{font-size:14px;font-weight:600;color:#42526E;text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px}
+.pricingPrice{font-size:36px;font-weight:700;color:#172B4D;margin:0 0 4px}
+.pricingPrice span{font-size:14px;font-weight:400;color:#42526E}
+.pricingPeriod{font-size:13px;color:#42526E;margin:0 0 24px}
+.pricingFeatures{list-style:none;padding:0;margin:0 0 28px}
+.pricingFeatures li{font-size:14px;color:#42526E;padding:8px 0;display:flex;align-items:center;gap:10px}
+.pricingCheck{color:#36B37E;font-size:16px;flex-shrink:0}
+
+/* Bottom CTA */
+.bottomCta{padding:80px 40px;text-align:center;background:linear-gradient(135deg,#003d9b 0%,#0052cc 100%);color:#fff}
+.bottomCta h2{font-size:32px;font-weight:700;margin:0 0 16px;line-height:40px}
+.bottomCta p{font-size:16px;opacity:.85;margin:0 0 32px;max-width:500px;margin-left:auto;margin-right:auto}
+.bottomCtaBtn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#fff;color:#003d9b;border-radius:8px;font-size:16px;font-weight:600;text-decoration:none;transition:all .25s;border:none;cursor:pointer}
+.bottomCtaBtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+
+/* Footer */
+.footer{padding:48px 40px 32px;background:#172B4D;color:#b2c5ff}
+.footerInner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.footerBrand h3{font-size:22px;font-weight:700;color:#fff;margin:0 0 8px}
+.footerBrand p{font-size:13px;color:#b2c5ff;line-height:22px;margin:0}
+.footerCol h4{font-size:12px;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:.8px;margin:0 0 16px}
+.footerLink{display:block;font-size:13px;color:#b2c5ff;text-decoration:none;padding:4px 0;transition:color .2s}
+.footerLink:hover{color:#fff}
+.footerBottom{max-width:1280px;margin:24px auto 0;padding-top:24px;border-top:1px solid rgba(178,197,255,.15);font-size:12px;color:rgba(178,197,255,.6);text-align:center}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.fadeUp{animation:fadeUp .6s ease both}
+.delay1{animation-delay:.1s}
+.delay2{animation-delay:.2s}
+.delay3{animation-delay:.3s}
+.delay4{animation-delay:.4s}
+
+/* Mobile Nav Overlay */
+.mobileOverlay{display:none}
+
+/* Responsive */
+@media(max-width:1024px){
+.featureGrid{grid-template-columns:repeat(2,1fr)}
+.teamGrid{grid-template-columns:repeat(2,1fr)}
+.footerInner{grid-template-columns:1fr 1fr}
+.aiContainer{grid-template-columns:1fr;gap:40px}
+}
+@media(max-width:768px){
+.navLinks{display:none}
+.mobileMenu{display:block}
+.mobileOverlay{display:none;position:fixed;inset:0;background:rgba(248,249,251,.97);backdrop-filter:blur(16px);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.mobileOverlay.open{display:flex}
+.mobileOverlay a,.mobileOverlay button{font-size:18px}
+.mobileClose{position:absolute;top:20px;right:20px;background:none;border:none;font-size:28px;cursor:pointer;color:#172B4D}
+.hero{padding:120px 20px 60px}
+.heroTitle{font-size:32px;line-height:40px;letter-spacing:-.01em}
+.heroSub{font-size:16px;margin-bottom:32px}
+.features,.teams,.pricing,.aiSection{padding:60px 20px}
+.sectionTitle{font-size:24px;line-height:32px}
+.featureGrid{grid-template-columns:1fr}
+.teamGrid{grid-template-columns:1fr 1fr}
+.pricingGrid{grid-template-columns:1fr}
+.footerInner{grid-template-columns:1fr;gap:24px}
+.nav{padding:12px 20px}
+.heroPreviewInner{padding:16px}
+.previewCol{min-width:180px}
+.bottomCta h2{font-size:24px}
+}
+
+/* heroGrid and trustGrid responsive */
+@media(max-width:900px){
+.heroGrid{grid-template-columns:1fr !important}
+.trustGrid{grid-template-columns:1fr !important}
+}

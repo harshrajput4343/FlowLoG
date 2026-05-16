@@ -158,6 +158,12 @@ a {
   100% { background-position: 200% 0; }
 }
 
+/* ─── Landing Page Body Override ─── */
+body:has(div[class*="landing"]) {
+  overflow: auto;
+  height: auto;
+}
+
 /* ─── Mobile Foundations ─── */
 
 /* Remove tap highlight on mobile */
