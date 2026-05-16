@@ -32,7 +32,7 @@ export default function LandingPage() {
           <button className={s.navCta} onClick={handleCta}>Get it free</button>
         </nav>
         <button className={s.mobileMenu} onClick={() => setMobileOpen(true)} aria-label="Menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#172B4D" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#172B4D" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
         </button>
       </header>
 
@@ -167,7 +167,7 @@ export default function LandingPage() {
                 <div className={s.pricingPlan}>Pro</div>
                 <div className={s.pricingPrice}>$9 <span>/year per user</span></div>
                 <ul className={s.pricingFeatures}>
-                  {['Everything in Free', 'Advanced Workflows', 'Admin controls', 'Priority 24/7 support'].map(f => (
+                  {['Everything in Free', 'Advanced Workflows', 'Custom Backgrounds', 'Priority 24/7 support'].map(f => (
                     <li key={f}><span className={s.pricingCheck}>✓</span> {f}</li>
                   ))}
                 </ul>
@@ -226,7 +226,7 @@ export default function LandingPage() {
             <a href="#" className={s.footerLink}>Help Center</a>
           </div>
         </div>
-        <div className={s.footerBottom}>© 2024 FlowLoG. All rights reserved.</div>
+        <div className={s.footerBottom}>© 2025 FlowLoG. All rights reserved.</div>
       </footer>
     </div>
   );
