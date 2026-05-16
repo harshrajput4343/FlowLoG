@@ -64,7 +64,7 @@ export default function Dashboard() {
     // Guard: redirect unauthenticated users to landing
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
     if (!token) {
-      router.replace('/landing');
+      router.replace('/');
       return;
     }
 
