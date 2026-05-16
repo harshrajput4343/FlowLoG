@@ -7,11 +7,19 @@ import s from './landing/page.module.css';
 export default function LandingPage() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-    if (token && token !== 'guest-token') { router.replace('/dashboard'); }
+    if (token && token !== 'guest-token') {
+      router.replace('/dashboard');
+    } else {
+      setAuthChecked(true);
+    }
   }, [router]);
+
+  if (!authChecked) return null;
+
 
   const handleCta = () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;

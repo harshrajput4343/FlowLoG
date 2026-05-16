@@ -140,7 +140,7 @@ export const Header = ({ onSearch }: HeaderProps) => {
             <span className={styles.hamburgerLine} />
           </button>
 
-          <Link href="/" className={styles.logo}>
+          <Link href="/dashboard" className={styles.logo}>
             <svg className={styles.logoIcon} width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="headerGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">

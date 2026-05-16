@@ -47,7 +47,7 @@ export const Sidebar = () => {
 
       {/* Main Navigation */}
       <div className={styles.navSection}>
-        <Link href="/" className={`${styles.navItem} ${pathname === '/' || pathname === '/boards' ? styles.active : ''}`}>
+        <Link href="/dashboard" className={`${styles.navItem} ${pathname === '/dashboard' || pathname === '/boards' ? styles.active : ''}`}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -87,7 +87,7 @@ export const Sidebar = () => {
 
       {expanded && (
         <div className={styles.workspaceSubItems}>
-          <Link href="/" className={`${styles.workspaceSubItem} ${pathname === '/' ? styles.activeSub : ''}`}>
+          <Link href="/dashboard" className={`${styles.workspaceSubItem} ${pathname === '/dashboard' ? styles.activeSub : ''}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <rect x="3" y="3" width="7" height="7" rx="1" />
               <rect x="14" y="3" width="7" height="7" rx="1" />
