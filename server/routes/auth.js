@@ -131,4 +131,58 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// ─── POST /api/auth/set-password ─────────────────────────────────────────────
+// For legacy accounts created before bcrypt was introduced.
+// Only works if the account currently has NO passwordHash (migration use only).
+// Once a password is set, use the normal login flow.
+router.post('/set-password', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      // Vague on purpose — don't reveal whether the email exists
+      return res.status(400).json({ error: 'No account found with this email' });
+    }
+
+    // Only allow setting a password if there is none yet (migration flow).
+    // Existing password holders must use a proper reset flow.
+    if (user.passwordHash) {
+      return res.status(400).json({ error: 'This account already has a password. Use the login form.' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    await prisma.user.update({
+      where: { email },
+      data:  { passwordHash }
+    });
+
+    // Issue a token so the user is immediately logged in after setting password
+    const token = issueToken(user.id);
+
+    res.json({
+      message: 'Password set successfully. You are now logged in.',
+      token,
+      user: {
+        id:        user.id,
+        name:      user.name,
+        email:     user.email,
+        avatarUrl: user.avatarUrl,
+        isPremium: user.isPremium
+      }
+    });
+  } catch (error) {
+    console.error('Set-password error:', error.message);
+    res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
 module.exports = router;
