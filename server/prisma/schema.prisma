@@ -30,6 +30,7 @@ model Board {
   title      String
   background String?
   ownerId    Int
+  shareToken String?       @unique
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
   owner      User          @relation("BoardOwner", fields: [ownerId], references: [id])
