@@ -22,14 +22,23 @@ export default function LoginPage() {
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  /** Persists auth info and redirects to dashboard */
+  /** Persists auth info and redirects — honours share-link redirects saved in sessionStorage */
   function storeAndRedirect(data: { token: string; user: Record<string, unknown> }) {
     localStorage.setItem('authToken', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     if (data.user && typeof data.user.isPremium !== 'undefined') {
       localStorage.setItem('isPremium', data.user.isPremium ? 'true' : 'false');
     }
-    router.push('/dashboard');
+    // If redirected here from a share link (or any protected page), go back there
+    const savedRedirect = typeof window !== 'undefined'
+      ? sessionStorage.getItem('redirectAfterLogin')
+      : null;
+    if (savedRedirect) {
+      sessionStorage.removeItem('redirectAfterLogin');
+      router.push(savedRedirect);
+    } else {
+      router.push('/dashboard');
+    }
   }
 
   // ── Login ───────────────────────────────────────────────────────────────────
