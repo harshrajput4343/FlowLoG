@@ -1,51 +1,60 @@
-// Simple auth middleware — extracts user ID from the "flowlog-temp-token-{id}" pattern
+/**
+ * Auth Middleware — verifies a signed JWT and attaches userId/isPremium to req.
+ *
+ * Fixes:
+ *   BUG 1  — replaced deterministic "flowlog-temp-token-{id}" with signed JWT
+ *   BUG 3  — removed guest-token and "logged-in" backdoors; unauthenticated
+ *             requests now receive 401 unless the route opts out of this middleware
+ */
+
+const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const authMiddleware = async (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+const JWT_SECRET = process.env.JWT_SECRET;
 
-  if (!token) {
+const authMiddleware = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  // Guest token — allow readonly-ish access but no user association
-  if (token === 'guest-token') {
-    req.userId = null;
-    req.isGuest = true;
-    req.isPremium = false;
-    return next();
+  const token = authHeader.replace('Bearer ', '').trim();
+
+  if (!JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET is not set in environment variables');
+    return res.status(500).json({ error: 'Server misconfiguration' });
   }
 
-  // Extract user ID from token format: "flowlog-temp-token-{id}"
-  const match = token.match(/^flowlog-temp-token-(\d+)$/);
-  if (match) {
-    req.userId = parseInt(match[1]);
-    req.isGuest = false;
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
 
-    // Look up user to attach isPremium
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: req.userId },
-        select: { isPremium: true }
-      });
-      req.isPremium = user?.isPremium || false;
-    } catch {
-      req.isPremium = false;
+    // Verify the user still exists (handles deleted accounts)
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, isPremium: true }
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found — please log in again' });
     }
 
-    return next();
-  }
+    req.userId    = user.id;
+    req.isPremium = user.isPremium;
+    req.isGuest   = false;
 
-  // Also support "logged-in" as a fallback (older format)
-  if (token === 'logged-in') {
-    req.userId = null;
-    req.isGuest = true;
-    req.isPremium = false;
     return next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Session expired — please log in again' });
+    }
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    console.error('Auth middleware error:', err);
+    return res.status(500).json({ error: 'Authentication error' });
   }
-
-  return res.status(401).json({ error: 'Invalid token' });
 };
 
 module.exports = authMiddleware;

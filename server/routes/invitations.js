@@ -1,23 +1,31 @@
-const express = require('express');
-const router = express.Router();
-const prisma = require('../prismaClient');
+const express  = require('express');
+const router   = express.Router();
+const crypto   = require('crypto');  // built-in Node.js — no extra install needed
+const prisma   = require('../prismaClient');
 const { sendInvitationEmail, isEmailConfigured } = require('../utils/emailService');
 const { deleteCache, deleteCachePattern } = require('../utils/redisClient');
 const authMiddleware = require('../middleware/auth');
+const requireAuth    = require('../middleware/requireAuth');
 
-// Helper function to generate token
+/**
+ * BUG 6 FIX — use crypto.randomBytes instead of Math.random().
+ * Math.random() is NOT cryptographically secure and its output can be
+ * predicted in some environments. randomBytes(32) gives 256 bits of entropy.
+ */
 function generateToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return crypto.randomBytes(32).toString('hex');
 }
 
 // Send invitation (auth required)
-router.post('/', authMiddleware, async (req, res) => {
+// BUG 2 FIX — requireAuth blocks guests + isPremium blocks non-premium users
+router.post('/', authMiddleware, requireAuth, async (req, res) => {
   try {
     const { email, workspaceId } = req.body;
     const senderId = req.userId;
 
-    if (!senderId) {
-      return res.status(401).json({ error: 'Authentication required to send invitations' });
+    // BUG 2 — server-side premium gate: localStorage can be trivially bypassed
+    if (!req.isPremium) {
+      return res.status(403).json({ error: 'Sending invitations requires a Pro subscription' });
     }
 
     if (!email) {
@@ -130,7 +138,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // Resend invitation
-router.post('/:id/resend', authMiddleware, async (req, res) => {
+router.post('/:id/resend', authMiddleware, requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const senderId = req.userId;
@@ -179,7 +187,7 @@ router.post('/:id/resend', authMiddleware, async (req, res) => {
 });
 
 // Cancel/delete invitation
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const senderId = req.userId;
@@ -201,14 +209,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // Accept invitation (when user clicks link)
-router.post('/accept/:token', authMiddleware, async (req, res) => {
+router.post('/accept/:token', authMiddleware, requireAuth, async (req, res) => {
   try {
     const { token } = req.params;
     const userId = req.userId;
-
-    if (!userId) {
-      return res.status(401).json({ error: 'Authentication required to join board' });
-    }
 
     const invitation = await prisma.invitation.findUnique({
       where: { token }

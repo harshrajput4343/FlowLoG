@@ -9,19 +9,20 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String        @unique
-  name         String?
-  avatarUrl    String?
-  createdAt    DateTime      @default(now())
+  id                 Int           @id @default(autoincrement())
+  email              String        @unique
+  name               String?
+  avatarUrl          String?
+  passwordHash       String?       // bcrypt hash — nullable for existing users
+  createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   isPremium          Boolean       @default(false)
   subscriptionExpiry DateTime?
   subscriptionPlan   String?
-  ownedBoards  Board[]       @relation("BoardOwner")
-  boardMembers BoardMember[]
-  cardMembers  CardMember[]
-  invitations  Invitation[]
+  ownedBoards        Board[]       @relation("BoardOwner")
+  boardMembers       BoardMember[]
+  cardMembers        CardMember[]
+  invitations        Invitation[]
 }
 
 model Board {

@@ -41,7 +41,9 @@ const BgPickerPanel = ({ board, onChangeBg, onBack }: {
   const [unsplashError, setUnsplashError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [page, setPage] = useState(1);
-  const premium = typeof window !== 'undefined' && localStorage.getItem('isPremium') === 'true';
+  // BUG 2 NOTE: isPremiumUser() is a UX hint only — the server enforces isPremium
+  // on /api/boards/:id (background update) and /api/invitations (send invite).
+  const premium = isPremiumUser();
 
   const searchUnsplash = async (query: string, pageNum: number = 1) => {
     if (!query.trim()) return;
@@ -211,8 +213,23 @@ const BgPickerPanel = ({ board, onChangeBg, onBack }: {
           <button
             className={styles.bgImageApplyBtn}
             onClick={() => {
-              const url = (document.getElementById('bg-image-url') as HTMLInputElement)?.value?.trim();
-              if (url) onChangeBg(`url(${url})`);
+              const rawUrl = (document.getElementById('bg-image-url') as HTMLInputElement)?.value?.trim();
+              if (!rawUrl) return;
+
+              // BUG 9 FIX — validate it's a real http/https URL before embedding
+              // into a CSS backgroundImage value to prevent CSS injection.
+              try {
+                const parsed = new URL(rawUrl);
+                if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+                  alert('Only http:// and https:// image URLs are supported.');
+                  return;
+                }
+                // Encode quotes to prevent breaking out of url("...") context
+                const safeUrl = rawUrl.replace(/["'\\]/g, '');
+                onChangeBg(`url(${safeUrl})`);
+              } catch {
+                alert('Please enter a valid image URL (starting with http:// or https://).');
+              }
             }}
           >Apply</button>
         </div>

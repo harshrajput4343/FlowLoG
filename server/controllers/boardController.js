@@ -1,225 +1,214 @@
-const prisma = require('../prismaClient');
-const { getCache, setCache, deleteCache } = require('../utils/redisClient');
+/**
+ * Board Controller
+ *
+ * Fixes:
+ *   BUG 3 — createBoard no longer falls back to ownerId=1 for guests;
+ *            req.userId is guaranteed by requireAuth at the route layer.
+ *   P1    — getBoardById uses select field pruning instead of fetching
+ *            every column on every nested row.
+ */
 
+const prisma = require('../prismaClient');
+const { getCache, setCache, deleteCache, deleteCachePattern } = require('../utils/redisClient');
+const { userHasBoardAccess } = require('../utils/boardAccess');
+
+// ─── GET /api/boards ──────────────────────────────────────────────────────────
 exports.getBoards = async (req, res) => {
   try {
     const userId = req.userId;
 
-    // Guests cannot list boards
-    if (!userId) {
-      return res.json([]);
-    }
+    if (!userId) return res.json([]);
 
-    // Try cache first — always user-specific
     const cacheKey = `boards:user:${userId}`;
     const cached = await getCache(cacheKey);
-    if (cached) {
-      return res.json(cached);
-    }
+    if (cached) return res.json(cached);
 
-    // Only show boards owned by or shared with this user
     const boards = await prisma.board.findMany({
       where: {
         OR: [
           { ownerId: userId },
-          { members: { some: { userId: userId } } }
+          { members: { some: { userId } } }
         ]
       },
-      include: {
-        lists: true,
+      select: {
+        id: true, title: true, background: true, ownerId: true, createdAt: true,
+        lists: { select: { id: true } },
         members: {
-          include: {
-            user: true
-          }
+          select: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } }
         }
       },
       orderBy: { createdAt: 'desc' }
     });
-    // Transform to flatten members
-    const transformedBoards = boards.map(board => ({
-      ...board,
-      members: board.members.map(m => m.user)
+
+    const transformed = boards.map(b => ({
+      ...b,
+      members: b.members.map(m => m.user)
     }));
 
-    // Cache for 60 seconds
-    await setCache(cacheKey, transformedBoards, 60);
-
-    res.json(transformedBoards);
+    await setCache(cacheKey, transformed, 60);
+    res.json(transformed);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// ─── GET /api/boards/:id ──────────────────────────────────────────────────────
 exports.getBoardById = async (req, res) => {
   const { id } = req.params;
   try {
-    const userId = req.userId;
+    const userId   = req.userId;
+    const boardId  = parseInt(id);
 
-    // Try cache first — user-specific cache key
-    const cacheKey = `board:${id}:user:${userId || 'guest'}`;
-    const cached = await getCache(cacheKey);
-    if (cached) {
-      return res.json(cached);
-    }
+    const cacheKey = `board:${boardId}:user:${userId}`;
+    const cached   = await getCache(cacheKey);
+    if (cached) return res.json(cached);
 
     const board = await prisma.board.findUnique({
-      where: { id: parseInt(id) },
-      include: {
+      where: { id: boardId },
+      select: {
+        id: true, title: true, background: true, ownerId: true, createdAt: true, updatedAt: true,
+        members: {
+          select: { userId: true, user: { select: { id: true, name: true, email: true, avatarUrl: true } } }
+        },
+        labels: { select: { id: true, name: true, color: true } },
         lists: {
-          include: {
+          orderBy: { order: 'asc' },
+          select: {
+            id: true, title: true, order: true, boardId: true, color: true,
             cards: {
-              include: {
+              orderBy: { order: 'asc' },
+              select: {
+                id: true, title: true, description: true, order: true, dueDate: true, listId: true,
                 labels: {
-                  include: { label: true }
+                  select: { label: { select: { id: true, name: true, color: true } } }
                 },
                 members: {
-                  include: { user: true }
+                  select: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } }
                 },
                 checklists: {
-                  include: { items: true }
+                  select: {
+                    id: true, title: true,
+                    items: { select: { id: true, content: true, isChecked: true } }
+                  }
                 }
-              },
-              orderBy: { order: 'asc' }
+              }
             }
-          },
-          orderBy: { order: 'asc' }
-        },
-        members: {
-          include: { user: true }
-        },
-        labels: true
+          }
+        }
       }
     });
+
     if (!board) return res.status(404).json({ error: 'Board not found' });
 
-    // Verify ownership or membership
-    if (userId) {
-      const isMember = board.members.some(m => m.userId === userId);
-      if (board.ownerId !== userId && !isMember) {
-        return res.status(403).json({ error: 'You do not have access to this board' });
-      }
-    } else {
-      return res.status(401).json({ error: 'Authentication required' });
+    // Access check — owner or member
+    const isMember = board.members.some(m => m.userId === userId);
+    if (board.ownerId !== userId && !isMember) {
+      return res.status(403).json({ error: 'You do not have access to this board' });
     }
 
-    // Transform to flatten join tables
-    const transformedBoard = {
+    const transformed = {
       ...board,
       members: board.members.map(m => m.user),
       lists: board.lists.map(list => ({
         ...list,
         cards: list.cards.map(card => ({
           ...card,
-          labels: card.labels.map(cl => cl.label),
-          members: card.members.map(cm => cm.user),
-          checklists: card.checklists.map(checklist => ({
-            ...checklist,
-            items: checklist.items
-          }))
+          labels:     card.labels.map(cl => cl.label),
+          members:    card.members.map(cm => cm.user),
+          checklists: card.checklists
         }))
       }))
     };
 
-    // Cache for 30 seconds
-    await setCache(cacheKey, transformedBoard, 30);
-
-    res.json(transformedBoard);
+    await setCache(cacheKey, transformed, 30);
+    res.json(transformed);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// ─── POST /api/boards ─────────────────────────────────────────────────────────
 exports.createBoard = async (req, res) => {
-  const { title, background, ownerId } = req.body;
+  const { title, background } = req.body;
   try {
-    // Use authenticated user's ID, fall back to provided ownerId, then default to 1
-    const resolvedOwnerId = req.userId || ownerId || 1;
+    // BUG 3 FIX: req.userId is guaranteed by requireAuth middleware —
+    // no more "|| ownerId || 1" fallback that let guests create boards for user 1.
+    const ownerId = req.userId;
 
     const newBoard = await prisma.board.create({
       data: {
         title,
         background: background || '#0079bf',
-        ownerId: resolvedOwnerId
+        ownerId
       }
     });
 
-    // Create predefined labels for the new board
+    // Create default labels
     await prisma.label.createMany({
       data: [
-        { name: 'Urgent', color: '#eb5a46', boardId: newBoard.id },
-        { name: 'Required', color: '#f2d600', boardId: newBoard.id },
-        { name: 'Not Urgent', color: '#61bd4f', boardId: newBoard.id },
+        { name: 'Urgent',    color: '#eb5a46', boardId: newBoard.id },
+        { name: 'Required',  color: '#f2d600', boardId: newBoard.id },
+        { name: 'Not Urgent',color: '#61bd4f', boardId: newBoard.id }
       ]
     });
 
-    // Invalidate boards list cache for this user
-    await deleteCache(`boards:user:${resolvedOwnerId}`);
-
+    await deleteCache(`boards:user:${ownerId}`);
     res.status(201).json(newBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// ─── DELETE /api/boards/:id ───────────────────────────────────────────────────
 exports.deleteBoard = async (req, res) => {
   const { id } = req.params;
   try {
-    const userId = req.userId;
+    const userId  = req.userId;
+    const boardId = parseInt(id);
 
-    // Verify ownership before deleting
-    if (userId) {
-      const board = await prisma.board.findUnique({ where: { id: parseInt(id) } });
-      if (!board) return res.status(404).json({ error: 'Board not found' });
-      if (board.ownerId !== userId) {
-        return res.status(403).json({ error: 'You can only delete your own boards' });
-      }
+    const board = await prisma.board.findUnique({ where: { id: boardId }, select: { ownerId: true } });
+    if (!board) return res.status(404).json({ error: 'Board not found' });
+    if (board.ownerId !== userId) {
+      return res.status(403).json({ error: 'Only the board owner can delete this board' });
     }
 
-    await prisma.board.delete({
-      where: { id: parseInt(id) }
-    });
+    await prisma.board.delete({ where: { id: boardId } });
 
-    // Invalidate caches for ALL users who might have this board (pattern match)
-    await deleteCachePattern(`board:${id}:user:*`);
-    // Invalidate boards list for owner
-    if (userId) await deleteCache(`boards:user:${userId}`);
-    // Also invalidate everyone's board list since a board was deleted? 
-    // (Optimization: we could find all members first, but pattern is safer if we track boards:user)
+    await deleteCachePattern(`board:${boardId}:user:*`);
     await deleteCachePattern(`boards:user:*`);
-
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// ─── PUT /api/boards/:id ──────────────────────────────────────────────────────
 exports.updateBoard = async (req, res) => {
   const { id } = req.params;
   const { title, background } = req.body;
   try {
-    const userId = req.userId;
+    const userId  = req.userId;
+    const boardId = parseInt(id);
 
-    // Verify ownership before updating
-    if (userId) {
-      const board = await prisma.board.findUnique({ where: { id: parseInt(id) } });
-      if (!board) return res.status(404).json({ error: 'Board not found' });
-      if (board.ownerId !== userId) {
-        return res.status(403).json({ error: 'You can only update your own boards' });
-      }
+    // BUG 2 / BUG 9 partial — block non-premium users from saving image backgrounds
+    // (The client also validates this, but server is the real gate.)
+    if (background && background.startsWith('url(') && !req.isPremium) {
+      return res.status(403).json({ error: 'Image backgrounds require a Pro subscription' });
+    }
+
+    const board = await prisma.board.findUnique({ where: { id: boardId }, select: { ownerId: true } });
+    if (!board) return res.status(404).json({ error: 'Board not found' });
+    if (board.ownerId !== userId) {
+      return res.status(403).json({ error: 'Only the board owner can update this board' });
     }
 
     const updatedBoard = await prisma.board.update({
-      where: { id: parseInt(id) },
-      data: { title, background }
+      where: { id: boardId },
+      data:  { title, background }
     });
 
-    // Invalidate caches for ALL users who might have this board (pattern match)
-    await deleteCachePattern(`board:${id}:user:*`);
-    // Invalidate boards list for owner
-    if (userId) await deleteCache(`boards:user:${userId}`);
-    // Also invalidate everyone's board list to show the new title/background
+    await deleteCachePattern(`board:${boardId}:user:*`);
     await deleteCachePattern(`boards:user:*`);
-
     res.json(updatedBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });
