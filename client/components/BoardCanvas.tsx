@@ -654,7 +654,7 @@ export const BoardCanvas = ({ board: initialBoard, readOnly = false }: Props) =>
                       {m.name?.[0] || '?'}
                     </div>
                   ))}
-                  <div ref={filtersRef} style={{ position: 'relative' }}>
+                  <div ref={filtersRef} style={{ position: 'relative', zIndex: 1001 }}>
                     <button
                       className={`${styles.boardActionBtn} ${showFilters ? styles.active : ''} ${filterLabel || filterMember ? styles.activeFilter : ''}`}
                       onClick={() => setShowFilters(!showFilters)}
