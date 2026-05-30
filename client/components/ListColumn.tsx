@@ -26,9 +26,10 @@ interface Props {
   onDeleteList: (listId: number) => Promise<void>;
   onUpdateListColor: (listId: number, color: string | null) => Promise<void>;
   onCardClick: (card: Card) => void;
+  readOnly?: boolean;
 }
 
-export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList, onUpdateListColor, onCardClick }: Props) => {
+export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList, onUpdateListColor, onCardClick, readOnly = false }: Props) => {
   const [editingTitle, setEditingTitle] = useState(false);
   const [title, setTitle] = useState(list.title);
   const [addingCard, setAddingCard] = useState(false);
@@ -93,7 +94,7 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
   } : {};
 
   return (
-    <Draggable draggableId={`list-${list.id}`} index={index}>
+    <Draggable draggableId={`list-${list.id}`} index={index} isDragDisabled={readOnly}>
       {(provided) => (
         <div
           ref={provided.innerRef}
@@ -103,9 +104,9 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
           <div
             className={styles.header}
             style={headerStyle}
-            {...provided.dragHandleProps}
+            {...(readOnly ? {} : provided.dragHandleProps)}
           >
-            {editingTitle ? (
+            {editingTitle && !readOnly ? (
               <input
                 type="text"
                 value={title}
@@ -118,61 +119,66 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
             ) : (
               <h2
                 className={styles.title}
-                onClick={() => setEditingTitle(true)}
-                style={headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}}
+                onClick={() => !readOnly && setEditingTitle(true)}
+                style={{
+                  ...(headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}),
+                  cursor: readOnly ? 'default' : 'pointer'
+                }}
               >
                 {list.title}
               </h2>
             )}
-            <div className={styles.headerActions}>
-              <button className={styles.actionBtn} title="Sparkle" style={headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}}>✦</button>
-              <div ref={menuRef} className={styles.menuWrapper}>
-                <button
-                  className={styles.menu}
-                  onClick={() => { setShowMenu(!showMenu); setShowColorPicker(false); }}
-                  style={headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}}
-                >
-                  ⋯
-                </button>
-                {showMenu && (
-                  <div className={styles.dropdown}>
-                    <button onClick={() => { setEditingTitle(true); setShowMenu(false); }}>
-                      Edit title
-                    </button>
-                    <button onClick={() => setShowColorPicker(!showColorPicker)}>
-                      🎨 Change color
-                    </button>
-                    {showColorPicker && (
-                      <div className={styles.colorPickerGrid}>
-                        {LIST_COLORS.map(c => (
-                          <div
-                            key={c.color}
-                            className={`${styles.colorSwatch} ${list.color === c.color ? styles.colorSwatchActive : ''}`}
-                            style={{ backgroundColor: c.color }}
-                            title={c.name}
-                            onClick={() => handleColorSelect(c.color)}
-                          />
-                        ))}
-                        {list.color && (
-                          <button
-                            className={styles.removeColorBtn}
-                            onClick={() => handleColorSelect(null)}
-                          >
-                            ✕ Remove color
-                          </button>
-                        )}
-                      </div>
-                    )}
-                    <button className={styles.deleteBtn} onClick={handleDeleteList}>
-                      Delete list
-                    </button>
-                  </div>
-                )}
+            {!readOnly && (
+              <div className={styles.headerActions}>
+                <button className={styles.actionBtn} title="Sparkle" style={headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}}>✦</button>
+                <div ref={menuRef} className={styles.menuWrapper}>
+                  <button
+                    className={styles.menu}
+                    onClick={() => { setShowMenu(!showMenu); setShowColorPicker(false); }}
+                    style={headerColor ? { color: isDarkColor(headerColor) ? '#ffffff' : '#172b4d' } : {}}
+                  >
+                    ⋯
+                  </button>
+                  {showMenu && (
+                    <div className={styles.dropdown}>
+                      <button onClick={() => { setEditingTitle(true); setShowMenu(false); }}>
+                        Edit title
+                      </button>
+                      <button onClick={() => setShowColorPicker(!showColorPicker)}>
+                        🎨 Change color
+                      </button>
+                      {showColorPicker && (
+                        <div className={styles.colorPickerGrid}>
+                          {LIST_COLORS.map(c => (
+                            <div
+                              key={c.color}
+                              className={`${styles.colorSwatch} ${list.color === c.color ? styles.colorSwatchActive : ''}`}
+                              style={{ backgroundColor: c.color }}
+                              title={c.name}
+                              onClick={() => handleColorSelect(c.color)}
+                            />
+                          ))}
+                          {list.color && (
+                            <button
+                              className={styles.removeColorBtn}
+                              onClick={() => handleColorSelect(null)}
+                            >
+                              ✕ Remove color
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      <button className={styles.deleteBtn} onClick={handleDeleteList}>
+                        Delete list
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          <Droppable droppableId={list.id.toString()} type="CARD">
+          <Droppable droppableId={list.id.toString()} type="CARD" isDropDisabled={readOnly}>
             {(provided, snapshot) => (
               <div
                 className={`${styles.cardList} ${snapshot.isDraggingOver ? styles.draggingOver : ''}`}
@@ -185,6 +191,7 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
                     card={card}
                     index={idx}
                     onClick={() => onCardClick(card)}
+                    readOnly={readOnly}
                   />
                 ))}
                 {provided.placeholder}
@@ -192,35 +199,37 @@ export const ListColumn = ({ list, index, onAddCard, onUpdateList, onDeleteList,
             )}
           </Droppable>
 
-          <div className={styles.footer}>
-            {addingCard ? (
-              <div className={styles.addCardForm}>
-                <textarea
-                  placeholder="Enter a title for this card..."
-                  value={newCardTitle}
-                  onChange={e => setNewCardTitle(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleAddCard();
-                    }
-                  }}
-                  autoFocus
-                />
-                <div className={styles.addCardActions}>
-                  <button onClick={handleAddCard}>Add Card</button>
-                  <button onClick={() => setAddingCard(false)}>×</button>
+          {!readOnly && (
+            <div className={styles.footer}>
+              {addingCard ? (
+                <div className={styles.addCardForm}>
+                  <textarea
+                    placeholder="Enter a title for this card..."
+                    value={newCardTitle}
+                    onChange={e => setNewCardTitle(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleAddCard();
+                      }
+                    }}
+                    autoFocus
+                  />
+                  <div className={styles.addCardActions}>
+                    <button onClick={handleAddCard}>Add Card</button>
+                    <button onClick={() => setAddingCard(false)}>×</button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <button
-                className={styles.addCardBtn}
-                onClick={() => setAddingCard(true)}
-              >
-                + Add a card
-              </button>
-            )}
-          </div>
+              ) : (
+                <button
+                  className={styles.addCardBtn}
+                  onClick={() => setAddingCard(true)}
+                >
+                  + Add a card
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </Draggable>

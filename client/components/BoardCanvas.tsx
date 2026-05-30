@@ -276,7 +276,7 @@ const LiveDate = () => {
   );
 };
 
-export const BoardCanvas = ({ board: initialBoard }: Props) => {
+export const BoardCanvas = ({ board: initialBoard, readOnly = false }: Props) => {
   const router = useRouter();
   const [board, setBoard] = useState(initialBoard);
   const [enabled, setEnabled] = useState(false);
@@ -539,6 +539,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
   }
 
   const onDragEnd = async (result: DropResult) => {
+    if (readOnly) return;
     const { destination, source, type } = result;
 
     if (!destination) return;
@@ -642,9 +643,11 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
             >
               <div className={styles.boardTitleBar}>
                 <h1 className={styles.boardTitle}>{board.title}</h1>
-                <button className={styles.workspaceSelector}>
-                  🏢 ▾
-                </button>
+                {!readOnly && (
+                  <button className={styles.workspaceSelector}>
+                    🏢 ▾
+                  </button>
+                )}
                 <div className={styles.boardActions}>
                   {board.members?.map(m => (
                     <div key={m.id} className={styles.memberAvatar} title={m.name || ''}>
@@ -671,97 +674,101 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
                       />
                     )}
                   </div>
-                  <button className={styles.boardActionBtn}>🔽</button>
-                  <button className={styles.boardActionBtn}>☆</button>
-                  <div ref={shareRef} style={{ position: 'relative' }}>
-                    <button className={styles.shareBtn} onClick={handleShareClick}>
-                      👥 Share
-                    </button>
-                    {showSharePopup && (
-                      <div className={styles.sharePopup}>
-                        <div className={styles.sharePopupHeader}>
-                          <h4>Share Board</h4>
-                          <button className={styles.sharePopupClose} onClick={() => setShowSharePopup(false)}>×</button>
-                        </div>
-                        <div className={styles.sharePopupContent}>
-                          {loadingShare ? (
-                            <div className={styles.shareLoading}>Generating link...</div>
-                          ) : shareToken ? (
-                            <>
-                              <p className={styles.shareText}>Anyone with this link can view this board in read-only mode:</p>
-                              <div className={styles.shareLinkWrapper}>
-                                <input
-                                  type="text"
-                                  readOnly
-                                  value={shareUrl}
-                                  className={styles.shareInput}
-                                  onClick={(e) => (e.target as HTMLInputElement).select()}
-                                />
-                                <button className={styles.copyBtn} onClick={handleCopyLink}>
-                                  {copied ? 'Copied!' : 'Copy'}
-                                </button>
-                              </div>
-                            </>
-                          ) : (
-                            <div className={styles.shareError}>Failed to generate share link.</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 3-dot Board Menu */}
-                  <div ref={boardMenuRef} style={{ position: 'relative' }}>
-                    <button
-                      className={`${styles.moreBtn} ${showBoardMenu ? styles.moreBtnActive : ''}`}
-                      onClick={() => {
-                        setShowBoardMenu(prev => !prev);
-                        setShowBgPanel(false);
-                      }}
-                      title="Board menu"
-                    >
-                      ⋯
-                    </button>
-
-                    {showBoardMenu && !showBgPanel && (
-                      <div className={styles.boardMenu}>
-                        <div className={styles.boardMenuHeader}>Board actions</div>
-                        <button
-                          className={styles.boardMenuItem}
-                          onClick={() => {
-                            setShowBgPanel(true);
-                          }}
-                        >
-                          <span className={styles.boardMenuIcon}>🎨</span>
-                          Change Background
+                  {!readOnly && (
+                    <>
+                      <button className={styles.boardActionBtn}>🔽</button>
+                      <button className={styles.boardActionBtn}>☆</button>
+                      <div ref={shareRef} style={{ position: 'relative' }}>
+                        <button className={styles.shareBtn} onClick={handleShareClick}>
+                          👥 Share
                         </button>
-                        <div className={styles.boardMenuDivider} />
-                        <button
-                          className={`${styles.boardMenuItem} ${styles.boardMenuDanger}`}
-                          onClick={() => {
-                            setShowBoardMenu(false);
-                            setShowDeleteConfirm(true);
-                          }}
-                        >
-                          <span className={styles.boardMenuIcon}>🗑️</span>
-                          Delete Board
-                        </button>
+                        {showSharePopup && (
+                          <div className={styles.sharePopup}>
+                            <div className={styles.sharePopupHeader}>
+                              <h4>Share Board</h4>
+                              <button className={styles.sharePopupClose} onClick={() => setShowSharePopup(false)}>×</button>
+                            </div>
+                            <div className={styles.sharePopupContent}>
+                              {loadingShare ? (
+                                <div className={styles.shareLoading}>Generating link...</div>
+                              ) : shareToken ? (
+                                <>
+                                  <p className={styles.shareText}>Anyone with this link can view this board in read-only mode:</p>
+                                  <div className={styles.shareLinkWrapper}>
+                                    <input
+                                      type="text"
+                                      readOnly
+                                      value={shareUrl}
+                                      className={styles.shareInput}
+                                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                                    />
+                                    <button className={styles.copyBtn} onClick={handleCopyLink}>
+                                      {copied ? 'Copied!' : 'Copy'}
+                                    </button>
+                                  </div>
+                                </>
+                              ) : (
+                                <div className={styles.shareError}>Failed to generate share link.</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
 
-                    {/* Background Picker Panel */}
-                    {showBgPanel && (
-                      <BgPickerPanel
-                        board={board}
-                        onChangeBg={(bg) => {
-                          handleChangeBg(bg);
-                          setShowBgPanel(false);
-                          setShowBoardMenu(false);
-                        }}
-                        onBack={() => setShowBgPanel(false)}
-                      />
-                    )}
-                  </div>
+                      {/* 3-dot Board Menu */}
+                      <div ref={boardMenuRef} style={{ position: 'relative' }}>
+                        <button
+                          className={`${styles.moreBtn} ${showBoardMenu ? styles.moreBtnActive : ''}`}
+                          onClick={() => {
+                            setShowBoardMenu(prev => !prev);
+                            setShowBgPanel(false);
+                          }}
+                          title="Board menu"
+                        >
+                          ⋯
+                        </button>
+
+                        {showBoardMenu && !showBgPanel && (
+                          <div className={styles.boardMenu}>
+                            <div className={styles.boardMenuHeader}>Board actions</div>
+                            <button
+                              className={styles.boardMenuItem}
+                              onClick={() => {
+                                setShowBgPanel(true);
+                              }}
+                            >
+                              <span className={styles.boardMenuIcon}>🎨</span>
+                              Change Background
+                            </button>
+                            <div className={styles.boardMenuDivider} />
+                            <button
+                              className={`${styles.boardMenuItem} ${styles.boardMenuDanger}`}
+                              onClick={() => {
+                                setShowBoardMenu(false);
+                                setShowDeleteConfirm(true);
+                              }}
+                            >
+                              <span className={styles.boardMenuIcon}>🗑️</span>
+                              Delete Board
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Background Picker Panel */}
+                        {showBgPanel && (
+                          <BgPickerPanel
+                            board={board}
+                            onChangeBg={(bg) => {
+                              handleChangeBg(bg);
+                              setShowBgPanel(false);
+                              setShowBoardMenu(false);
+                            }}
+                            onBack={() => setShowBgPanel(false)}
+                          />
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -776,34 +783,37 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
                     onDeleteList={handleDeleteList}
                     onUpdateListColor={handleUpdateListColor}
                     onCardClick={handleCardClick}
+                    readOnly={readOnly}
                   />
                 ))}
                 {provided.placeholder}
-                <div className={styles.addListWrapper}>
-                  {addingList ? (
-                    <div className={styles.addListForm}>
-                      <input
-                        type="text"
-                        placeholder="Enter list title..."
-                        value={newListTitle}
-                        onChange={e => setNewListTitle(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && handleAddList()}
-                        autoFocus
-                      />
-                      <div className={styles.addListActions}>
-                        <button onClick={handleAddList}>Add List</button>
-                        <button onClick={() => setAddingList(false)}>×</button>
+                {!readOnly && (
+                  <div className={styles.addListWrapper}>
+                    {addingList ? (
+                      <div className={styles.addListForm}>
+                        <input
+                          type="text"
+                          placeholder="Enter list title..."
+                          value={newListTitle}
+                          onChange={e => setNewListTitle(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleAddList()}
+                          autoFocus
+                        />
+                        <div className={styles.addListActions}>
+                          <button onClick={handleAddList}>Add List</button>
+                          <button onClick={() => setAddingList(false)}>×</button>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <button
-                      className={styles.addListBtn}
-                      onClick={() => setAddingList(true)}
-                    >
-                      + Add another list
-                    </button>
-                  )}
-                </div>
+                    ) : (
+                      <button
+                        className={styles.addListBtn}
+                        onClick={() => setAddingList(true)}
+                      >
+                        + Add another list
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -849,6 +859,7 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
           onClose={() => setSelectedCard(null)}
           onUpdate={handleCardUpdate}
           onDelete={handleCardDelete}
+          readOnly={readOnly}
         />
       )}
 

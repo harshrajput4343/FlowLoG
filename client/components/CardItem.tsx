@@ -7,22 +7,23 @@ interface Props {
   card: Card;
   index: number;
   onClick: () => void;
+  readOnly?: boolean;
 }
 
-export const CardItem = ({ card, index, onClick }: Props) => {
+export const CardItem = ({ card, index, onClick, readOnly = false }: Props) => {
   const completedChecks = card.checklists?.reduce((acc, list) =>
     acc + list.items.filter(i => i.isChecked).length, 0) || 0;
   const totalChecks = card.checklists?.reduce((acc, list) =>
     acc + list.items.length, 0) || 0;
 
   return (
-    <Draggable draggableId={card.id.toString()} index={index}>
+    <Draggable draggableId={card.id.toString()} index={index} isDragDisabled={readOnly}>
       {(provided, snapshot) => (
         <div
           className={`${styles.card} ${snapshot.isDragging ? styles.dragging : ''}`}
           ref={provided.innerRef}
           {...provided.draggableProps}
-          {...provided.dragHandleProps}
+          {...(readOnly ? {} : provided.dragHandleProps)}
           onClick={onClick}
         >
           {card.coverUrl && (
@@ -48,7 +49,7 @@ export const CardItem = ({ card, index, onClick }: Props) => {
 
             <div className={styles.title}>{card.title}</div>
 
-            <button className={styles.actionBtn}>✎</button>
+            {!readOnly && <button className={styles.actionBtn}>✎</button>}
 
             {(card.dueDate || (card.members && card.members.length > 0) || totalChecks > 0 || card.description) && (
               <div className={styles.meta}>
