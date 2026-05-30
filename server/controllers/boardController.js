@@ -214,3 +214,102 @@ exports.updateBoard = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// ─── POST /api/boards/:id/share ──────────────────────────────────────────────
+exports.generateShareToken = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const userId = req.userId;
+    const boardId = parseInt(id);
+
+    const board = await prisma.board.findUnique({
+      where: { id: boardId },
+      select: { ownerId: true, members: { select: { userId: true } } }
+    });
+
+    if (!board) return res.status(404).json({ error: 'Board not found' });
+
+    const isMember = board.members.some(m => m.userId === userId);
+    if (board.ownerId !== userId && !isMember) {
+      return res.status(403).json({ error: 'You do not have access to this board' });
+    }
+
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(16).toString('hex');
+
+    await prisma.board.update({
+      where: { id: boardId },
+      data: { shareToken: token }
+    });
+
+    res.json({ shareToken: token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ─── GET /api/boards/share/:token ─────────────────────────────────────────────
+exports.getBoardByShareToken = async (req, res) => {
+  const { token } = req.params;
+  try {
+    if (!token) {
+      return res.status(400).json({ error: 'Share token is required' });
+    }
+
+    const board = await prisma.board.findUnique({
+      where: { shareToken: token },
+      select: {
+        id: true, title: true, background: true, ownerId: true, createdAt: true, updatedAt: true,
+        members: {
+          select: { userId: true, user: { select: { id: true, name: true, email: true, avatarUrl: true } } }
+        },
+        labels: { select: { id: true, name: true, color: true } },
+        lists: {
+          orderBy: { order: 'asc' },
+          select: {
+            id: true, title: true, order: true, boardId: true, color: true,
+            cards: {
+              orderBy: { order: 'asc' },
+              select: {
+                id: true, title: true, description: true, order: true, dueDate: true, listId: true,
+                labels: {
+                  select: { label: { select: { id: true, name: true, color: true } } }
+                },
+                members: {
+                  select: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } }
+                },
+                checklists: {
+                  select: {
+                    id: true, title: true,
+                    items: { select: { id: true, content: true, isChecked: true } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!board) return res.status(404).json({ error: 'Board not found' });
+
+    const transformed = {
+      ...board,
+      members: board.members.map(m => m.user),
+      lists: board.lists.map(list => ({
+        ...list,
+        cards: list.cards.map(card => ({
+          ...card,
+          labels:     card.labels.map(cl => cl.label),
+          members:    card.members.map(cm => cm.user),
+          checklists: card.checklists
+        }))
+      }))
+    };
+
+    res.json(transformed);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+

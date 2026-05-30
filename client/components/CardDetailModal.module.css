@@ -742,3 +742,22 @@
     font-size: 15px;
   }
 }
+
+.readOnlyDesc {
+  cursor: default !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.readOnlyDesc:hover {
+  background: transparent !important;
+}
+
+.readOnlyItem {
+  cursor: default !important;
+}
+
+.readOnlyItem:hover {
+  background: transparent !important;
+}

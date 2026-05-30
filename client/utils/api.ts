@@ -60,6 +60,19 @@ export const apiClient = {
     });
     return res.json();
   },
+  generateShareToken: async (id: number): Promise<{ shareToken: string }> => {
+    const res = await fetch(`${API_BASE}/boards/${id}/share`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to generate share token');
+    return res.json();
+  },
+  getBoardByShareToken: async (token: string): Promise<any> => {
+    const res = await fetch(`${API_BASE}/boards/share/${token}`);
+    if (!res.ok) throw new Error('Failed to fetch shared board');
+    return res.json();
+  },
 
   // Lists
   createList: async (title: string, boardId: number) => {

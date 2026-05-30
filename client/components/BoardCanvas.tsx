@@ -14,6 +14,7 @@ import styles from './BoardCanvas.module.css';
 
 interface Props {
   board: Board;
+  readOnly?: boolean;
 }
 
 const BG_COLORS = [
@@ -288,12 +289,59 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
   const [showFilters, setShowFilters] = useState(false);
   const [showSwitchBoards, setShowSwitchBoards] = useState(false);
 
+  // Share popup state
+  const [showSharePopup, setShowSharePopup] = useState(false);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [loadingShare, setLoadingShare] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+
   // Board dot-menu state
   const [showBoardMenu, setShowBoardMenu] = useState(false);
   const [showBgPanel, setShowBgPanel] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const boardMenuRef = useRef<HTMLDivElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
+
+  // Close share popup on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShowSharePopup(false);
+      }
+    };
+    if (showSharePopup) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSharePopup]);
+
+  const handleShareClick = async () => {
+    if (showSharePopup) {
+      setShowSharePopup(false);
+      return;
+    }
+    setShowSharePopup(true);
+    setLoadingShare(true);
+    setCopied(false);
+    try {
+      const data = await apiClient.generateShareToken(board.id);
+      setShareToken(data.shareToken);
+    } catch (err) {
+      console.error('Failed to generate share token', err);
+    } finally {
+      setLoadingShare(false);
+    }
+  };
+
+  const shareUrl = shareToken ? `https://flowlogwork.vercel.app/board/share/${shareToken}` : '';
+
+  const handleCopyLink = () => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     const animation = requestAnimationFrame(() => setEnabled(true));
@@ -625,9 +673,42 @@ export const BoardCanvas = ({ board: initialBoard }: Props) => {
                   </div>
                   <button className={styles.boardActionBtn}>🔽</button>
                   <button className={styles.boardActionBtn}>☆</button>
-                  <button className={styles.shareBtn}>
-                    👥 Share
-                  </button>
+                  <div ref={shareRef} style={{ position: 'relative' }}>
+                    <button className={styles.shareBtn} onClick={handleShareClick}>
+                      👥 Share
+                    </button>
+                    {showSharePopup && (
+                      <div className={styles.sharePopup}>
+                        <div className={styles.sharePopupHeader}>
+                          <h4>Share Board</h4>
+                          <button className={styles.sharePopupClose} onClick={() => setShowSharePopup(false)}>×</button>
+                        </div>
+                        <div className={styles.sharePopupContent}>
+                          {loadingShare ? (
+                            <div className={styles.shareLoading}>Generating link...</div>
+                          ) : shareToken ? (
+                            <>
+                              <p className={styles.shareText}>Anyone with this link can view this board in read-only mode:</p>
+                              <div className={styles.shareLinkWrapper}>
+                                <input
+                                  type="text"
+                                  readOnly
+                                  value={shareUrl}
+                                  className={styles.shareInput}
+                                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                                />
+                                <button className={styles.copyBtn} onClick={handleCopyLink}>
+                                  {copied ? 'Copied!' : 'Copy'}
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <div className={styles.shareError}>Failed to generate share link.</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* 3-dot Board Menu */}
                   <div ref={boardMenuRef} style={{ position: 'relative' }}>

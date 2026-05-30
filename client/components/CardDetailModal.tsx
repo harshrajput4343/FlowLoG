@@ -14,6 +14,7 @@ interface Props {
   onUpdate: (card: Card) => void;
   onDelete: () => void;
   onLabelsChange?: () => void;
+  readOnly?: boolean;
 }
 
 // Preset colors for labels like Trello
@@ -38,7 +39,8 @@ export const CardDetailModal = ({
   onClose,
   onUpdate,
   onDelete,
-  onLabelsChange
+  onLabelsChange,
+  readOnly = false
 }: Props) => {
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description || '');
@@ -304,6 +306,7 @@ export const CardDetailModal = ({
             onChange={e => setTitle(e.target.value)}
             onBlur={handleSaveTitle}
             onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
+            readOnly={readOnly}
           />
           <div className={styles.subtitle}>
             in list <span style={{ textDecoration: 'underline' }}>To Do</span>
@@ -322,88 +325,90 @@ export const CardDetailModal = ({
                       {m.avatarUrl ? <img src={m.avatarUrl} alt="" className={styles.memberAvatar} /> : m.name[0]}
                     </div>
                   ))}
-                  <div ref={memberMenuRef} style={{ position: 'relative', display: 'inline-block' }}>
-                  <button className={styles.metaBtn} onClick={() => setShowMemberMenu(prev => !prev)}>+</button>
+                  {!readOnly && (
+                    <div ref={memberMenuRef} style={{ position: 'relative', display: 'inline-block' }}>
+                      <button className={styles.metaBtn} onClick={() => setShowMemberMenu(prev => !prev)}>+</button>
 
-                  {showMemberMenu && (
-                    <div className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
-                      <div className={styles.popupHeader}>Members</div>
-                      {allUsers.length > 0 ? allUsers.map(m => (
-                        <div
-                          key={m.id}
-                          className={styles.popupItem}
-                          onClick={() => toggleMember(m)}
-                        >
-                          <div className={styles.popupAvatar}>{m.name[0]}</div>
-                          <span style={{ flex: 1 }}>{m.name}</span>
-                          {card.members.some(cm => cm.id === m.id) && <span style={{ color: '#61bd4f' }}>✓</span>}
-                        </div>
-                      )) : (
-                        <div style={{ color: '#9fadbc', fontSize: '13px', padding: '8px' }}>No users found</div>
-                      )}
-
-                      <div className={styles.popupDivider}></div>
-
-                      {isPremiumUser() ? (
-                        !showAddMember ? (
-                          <button
-                            className={styles.createLabelBtn}
-                            onClick={() => { setShowAddMember(true); setMemberError(''); }}
-                          >
-                            + Add a new member
-                          </button>
-                        ) : (
-                          <div className={styles.createLabelForm}>
-                            {memberError && (
-                              <div style={{ color: '#ff5630', fontSize: '12px', padding: '0 4px' }}>{memberError}</div>
-                            )}
-                            <input
-                              type="text"
-                              placeholder="Name"
-                              value={newMemberName}
-                              onChange={e => setNewMemberName(e.target.value)}
-                              className={styles.labelInput}
-                              autoFocus
-                            />
-                            <input
-                              type="email"
-                              placeholder="Email"
-                              value={newMemberEmail}
-                              onChange={e => setNewMemberEmail(e.target.value)}
-                              className={styles.labelInput}
-                            />
-                            <div className={styles.createLabelActions}>
-                              <button
-                                onClick={async () => {
-                                  if (!newMemberName.trim() || !newMemberEmail.trim()) {
-                                    setMemberError('Name and email are required');
-                                    return;
-                                  }
-                                  try {
-                                    const newUser = await apiClient.createUser(newMemberName.trim(), newMemberEmail.trim());
-                                    setAllUsers([...allUsers, newUser]);
-                                    setNewMemberName('');
-                                    setNewMemberEmail('');
-                                    setShowAddMember(false);
-                                    setMemberError('');
-                                  } catch (err: any) {
-                                    setMemberError(err.message || 'Failed to add member');
-                                  }
-                                }}
-                                className={styles.createBtn}
-                              >Add</button>
-                              <button onClick={() => { setShowAddMember(false); setMemberError(''); }} className={styles.cancelBtn}>Cancel</button>
+                      {showMemberMenu && (
+                        <div className={styles.popupMenu} style={{ left: '0' }} onClick={e => e.stopPropagation()}>
+                          <div className={styles.popupHeader}>Members</div>
+                          {allUsers.length > 0 ? allUsers.map(m => (
+                            <div
+                              key={m.id}
+                              className={styles.popupItem}
+                              onClick={() => toggleMember(m)}
+                            >
+                              <div className={styles.popupAvatar}>{m.name[0]}</div>
+                              <span style={{ flex: 1 }}>{m.name}</span>
+                              {card.members.some(cm => cm.id === m.id) && <span style={{ color: '#61bd4f' }}>✓</span>}
                             </div>
-                          </div>
-                        )
-                      ) : (
-                        <a href="/pricing" style={{ display: 'block', padding: '8px', fontSize: '12px', color: '#f59e0b', textDecoration: 'none', textAlign: 'center' }}>
-                          🔒 Upgrade to Pro to add members
-                        </a>
+                          )) : (
+                            <div style={{ color: '#9fadbc', fontSize: '13px', padding: '8px' }}>No users found</div>
+                          )}
+
+                          <div className={styles.popupDivider}></div>
+
+                          {isPremiumUser() ? (
+                            !showAddMember ? (
+                              <button
+                                className={styles.createLabelBtn}
+                                onClick={() => { setShowAddMember(true); setMemberError(''); }}
+                              >
+                                + Add a new member
+                              </button>
+                            ) : (
+                              <div className={styles.createLabelForm}>
+                                {memberError && (
+                                  <div style={{ color: '#ff5630', fontSize: '12px', padding: '0 4px' }}>{memberError}</div>
+                                )}
+                                <input
+                                  type="text"
+                                  placeholder="Name"
+                                  value={newMemberName}
+                                  onChange={e => setNewMemberName(e.target.value)}
+                                  className={styles.labelInput}
+                                  autoFocus
+                                />
+                                <input
+                                  type="email"
+                                  placeholder="Email"
+                                  value={newMemberEmail}
+                                  onChange={e => setNewMemberEmail(e.target.value)}
+                                  className={styles.labelInput}
+                                />
+                                <div className={styles.createLabelActions}>
+                                  <button
+                                    onClick={async () => {
+                                      if (!newMemberName.trim() || !newMemberEmail.trim()) {
+                                        setMemberError('Name and email are required');
+                                        return;
+                                      }
+                                      try {
+                                        const newUser = await apiClient.createUser(newMemberName.trim(), newMemberEmail.trim());
+                                        setAllUsers([...allUsers, newUser]);
+                                        setNewMemberName('');
+                                        setNewMemberEmail('');
+                                        setShowAddMember(false);
+                                        setMemberError('');
+                                      } catch (err: any) {
+                                        setMemberError(err.message || 'Failed to add member');
+                                      }
+                                    }}
+                                    className={styles.createBtn}
+                                  >Add</button>
+                                  <button onClick={() => { setShowAddMember(false); setMemberError(''); }} className={styles.cancelBtn}>Cancel</button>
+                                </div>
+                              </div>
+                            )
+                          ) : (
+                            <a href="/pricing" style={{ display: 'block', padding: '8px', fontSize: '12px', color: '#f59e0b', textDecoration: 'none', textAlign: 'center' }}>
+                              🔒 Upgrade to Pro to add members
+                            </a>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}
-                  </div>
                 </div>
               </div>
 
@@ -415,92 +420,25 @@ export const CardDetailModal = ({
                       {l.name}
                     </div>
                   ))}
-                  <div ref={labelMenuRef} style={{ position: 'relative', display: 'inline-block' }}>
-                  <button className={styles.metaBtn} onClick={() => setShowLabelMenu(prev => !prev)}>+</button>
+                  {!readOnly && (
+                    <div ref={labelMenuRef} style={{ position: 'relative', display: 'inline-block' }}>
+                      <button className={styles.metaBtn} onClick={() => setShowLabelMenu(prev => !prev)}>+</button>
 
-                  {showLabelMenu && (
-                    <div className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
-                      <div className={styles.popupHeader}>Labels</div>
+                      {showLabelMenu && (
+                        <div className={styles.popupMenu} style={{ left: '100px' }} onClick={e => e.stopPropagation()}>
+                          <div className={styles.popupHeader}>Labels</div>
 
-                      {/* Editing a label */}
-                      {editingLabelId !== null ? (
-                        <div className={styles.createLabelForm}>
-                          <div className={styles.labelPreview} style={{ backgroundColor: editLabelColor }}>
-                            {editLabelName || 'Preview'}
-                          </div>
-                          <input
-                            type="text"
-                            placeholder="Label name..."
-                            value={editLabelName}
-                            onChange={(e) => setEditLabelName(e.target.value)}
-                            className={styles.labelInput}
-                            autoFocus
-                          />
-                          <div className={styles.colorGrid}>
-                            {LABEL_COLORS.map(c => (
-                              <div
-                                key={c.color}
-                                className={`${styles.colorOption} ${editLabelColor === c.color ? styles.colorSelected : ''}`}
-                                style={{ backgroundColor: c.color }}
-                                onClick={() => setEditLabelColor(c.color)}
-                                title={c.name}
-                              />
-                            ))}
-                          </div>
-                          <div className={styles.createLabelActions}>
-                            <button onClick={handleUpdateLabel} className={styles.createBtn}>Save</button>
-                            <button onClick={() => setEditingLabelId(null)} className={styles.cancelBtn}>Cancel</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          {/* Existing labels */}
-                          {localLabels.map(l => (
-                            <div
-                              key={l.id}
-                              className={styles.popupItem}
-                              onClick={() => toggleLabel(l)}
-                            >
-                              <div className={styles.labelColor} style={{ backgroundColor: l.color }}></div>
-                              <span style={{ flex: 1 }}>{l.name || 'Unnamed'}</span>
-                              {card.labels.some(cl => cl.id === l.id) && <span style={{ color: '#61bd4f' }}>✓</span>}
-                              <button
-                                className={styles.editLabelBtn}
-                                onClick={(e) => startEditLabel(l, e)}
-                                title="Edit label"
-                              >
-                                ✏️
-                              </button>
-                              <button
-                                className={styles.deleteLabelBtn}
-                                onClick={(e) => handleDeleteLabel(l.id, e)}
-                                title="Delete label"
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          ))}
-
-                          <div className={styles.popupDivider}></div>
-
-                          {/* Create new label */}
-                          {!showCreateLabel ? (
-                            <button
-                              className={styles.createLabelBtn}
-                              onClick={() => setShowCreateLabel(true)}
-                            >
-                              + Create a new label
-                            </button>
-                          ) : (
+                          {/* Editing a label */}
+                          {editingLabelId !== null ? (
                             <div className={styles.createLabelForm}>
-                              <div className={styles.labelPreview} style={{ backgroundColor: selectedColor }}>
-                                {newLabelName || 'Preview'}
+                              <div className={styles.labelPreview} style={{ backgroundColor: editLabelColor }}>
+                                {editLabelName || 'Preview'}
                               </div>
                               <input
                                 type="text"
                                 placeholder="Label name..."
-                                value={newLabelName}
-                                onChange={(e) => setNewLabelName(e.target.value)}
+                                value={editLabelName}
+                                onChange={(e) => setEditLabelName(e.target.value)}
                                 className={styles.labelInput}
                                 autoFocus
                               />
@@ -508,24 +446,93 @@ export const CardDetailModal = ({
                                 {LABEL_COLORS.map(c => (
                                   <div
                                     key={c.color}
-                                    className={`${styles.colorOption} ${selectedColor === c.color ? styles.colorSelected : ''}`}
+                                    className={`${styles.colorOption} ${editLabelColor === c.color ? styles.colorSelected : ''}`}
                                     style={{ backgroundColor: c.color }}
-                                    onClick={() => setSelectedColor(c.color)}
+                                    onClick={() => setEditLabelColor(c.color)}
                                     title={c.name}
                                   />
                                 ))}
                               </div>
                               <div className={styles.createLabelActions}>
-                                <button onClick={handleCreateLabel} className={styles.createBtn}>Create</button>
-                                <button onClick={() => setShowCreateLabel(false)} className={styles.cancelBtn}>Cancel</button>
+                                <button onClick={handleUpdateLabel} className={styles.createBtn}>Save</button>
+                                <button onClick={() => setEditingLabelId(null)} className={styles.cancelBtn}>Cancel</button>
                               </div>
                             </div>
+                          ) : (
+                            <>
+                              {/* Existing labels */}
+                              {localLabels.map(l => (
+                                <div
+                                  key={l.id}
+                                  className={styles.popupItem}
+                                  onClick={() => toggleLabel(l)}
+                                >
+                                  <div className={styles.labelColor} style={{ backgroundColor: l.color }}></div>
+                                  <span style={{ flex: 1 }}>{l.name || 'Unnamed'}</span>
+                                  {card.labels.some(cl => cl.id === l.id) && <span style={{ color: '#61bd4f' }}>✓</span>}
+                                  <button
+                                    className={styles.editLabelBtn}
+                                    onClick={(e) => startEditLabel(l, e)}
+                                    title="Edit label"
+                                  >
+                                    ✏️
+                                  </button>
+                                  <button
+                                    className={styles.deleteLabelBtn}
+                                    onClick={(e) => handleDeleteLabel(l.id, e)}
+                                    title="Delete label"
+                                  >
+                                    🗑️
+                                  </button>
+                                </div>
+                              ))}
+
+                              <div className={styles.popupDivider}></div>
+
+                              {/* Create new label */}
+                              {!showCreateLabel ? (
+                                <button
+                                  className={styles.createLabelBtn}
+                                  onClick={() => setShowCreateLabel(true)}
+                                >
+                                  + Create a new label
+                                </button>
+                              ) : (
+                                <div className={styles.createLabelForm}>
+                                  <div className={styles.labelPreview} style={{ backgroundColor: selectedColor }}>
+                                    {newLabelName || 'Preview'}
+                                  </div>
+                                  <input
+                                    type="text"
+                                    placeholder="Label name..."
+                                    value={newLabelName}
+                                    onChange={(e) => setNewLabelName(e.target.value)}
+                                    className={styles.labelInput}
+                                    autoFocus
+                                  />
+                                  <div className={styles.colorGrid}>
+                                    {LABEL_COLORS.map(c => (
+                                      <div
+                                        key={c.color}
+                                        className={`${styles.colorOption} ${selectedColor === c.color ? styles.colorSelected : ''}`}
+                                        style={{ backgroundColor: c.color }}
+                                        onClick={() => setSelectedColor(c.color)}
+                                        title={c.name}
+                                      />
+                                    ))}
+                                  </div>
+                                  <div className={styles.createLabelActions}>
+                                    <button onClick={handleCreateLabel} className={styles.createBtn}>Create</button>
+                                    <button onClick={() => setShowCreateLabel(false)} className={styles.cancelBtn}>Cancel</button>
+                                  </div>
+                                </div>
+                              )}
+                            </>
                           )}
-                        </>
+                        </div>
                       )}
                     </div>
                   )}
-                  </div>
                 </div>
               </div>
             </div>
@@ -535,11 +542,11 @@ export const CardDetailModal = ({
               <span className={styles.headerIcon}>≡</span>
               <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>Description</h3>
-                {editingDesc && (
+                {editingDesc && !readOnly && (
                   <button className={styles.saveBtn} onClick={handleSaveDesc}>Save</button>
                 )}
               </div>
-              {editingDesc ? (
+              {editingDesc && !readOnly ? (
                 <textarea
                   className={styles.descEditor}
                   value={description}
@@ -549,10 +556,10 @@ export const CardDetailModal = ({
                 />
               ) : (
                 <div
-                  className={styles.descPlaceholder}
-                  onClick={() => setEditingDesc(true)}
+                  className={`${styles.descPlaceholder} ${readOnly ? styles.readOnlyDesc : ''}`}
+                  onClick={() => !readOnly && setEditingDesc(true)}
                 >
-                  {description || 'Add a more detailed description...'}
+                  {description || (readOnly ? 'No description' : 'Add a more detailed description...')}
                 </div>
               )}
             </div>
@@ -568,7 +575,9 @@ export const CardDetailModal = ({
                   <span className={styles.headerIcon}>📋</span>
                   <div className={styles.sectionHeader}>
                     <h3 className={styles.sectionTitle}>{cl.title}</h3>
-                    <button className={styles.deleteBtn} onClick={() => handleDeleteChecklist(cl.id)}>Delete</button>
+                    {!readOnly && (
+                      <button className={styles.deleteBtn} onClick={() => handleDeleteChecklist(cl.id)}>Delete</button>
+                    )}
                   </div>
                   <div className={styles.progressRow}>
                     <span className={styles.progressPercent}>{Math.round(progressPercent)}%</span>
@@ -582,8 +591,8 @@ export const CardDetailModal = ({
                   {cl.items.map(item => (
                     <div
                       key={item.id}
-                      className={styles.checklistItem}
-                      onClick={() => handleToggleChecklistItem(cl.id, item.id)}
+                      className={`${styles.checklistItem} ${readOnly ? styles.readOnlyItem : ''}`}
+                      onClick={() => !readOnly && handleToggleChecklistItem(cl.id, item.id)}
                     >
                       <div className={`${styles.checkbox} ${item.isChecked ? styles.checked : ''}`}>
                         {item.isChecked && '✓'}
@@ -593,24 +602,26 @@ export const CardDetailModal = ({
                       </span>
                     </div>
                   ))}
-                  {addingItemToChecklist === cl.id ? (
-                    <div className={styles.addItemForm}>
-                      <input
-                        type="text"
-                        placeholder="Add an item..."
-                        value={newItemContent}
-                        onChange={e => setNewItemContent(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && handleAddChecklistItem(cl.id)}
-                        className={styles.addItemInput}
-                        autoFocus
-                      />
-                      <div className={styles.addItemActions}>
-                        <button onClick={() => handleAddChecklistItem(cl.id)} className={styles.createBtn}>Add</button>
-                        <button onClick={() => { setAddingItemToChecklist(null); setNewItemContent(''); }} className={styles.cancelBtn}>Cancel</button>
+                  {!readOnly && (
+                    addingItemToChecklist === cl.id ? (
+                      <div className={styles.addItemForm}>
+                        <input
+                          type="text"
+                          placeholder="Add an item..."
+                          value={newItemContent}
+                          onChange={e => setNewItemContent(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleAddChecklistItem(cl.id)}
+                          className={styles.addItemInput}
+                          autoFocus
+                        />
+                        <div className={styles.addItemActions}>
+                          <button onClick={() => handleAddChecklistItem(cl.id)} className={styles.createBtn}>Add</button>
+                          <button onClick={() => { setAddingItemToChecklist(null); setNewItemContent(''); }} className={styles.cancelBtn}>Cancel</button>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <button className={styles.addItemBtn} onClick={() => setAddingItemToChecklist(cl.id)}>Add an item</button>
+                    ) : (
+                      <button className={styles.addItemBtn} onClick={() => setAddingItemToChecklist(cl.id)}>Add an item</button>
+                    )
                   )}
                 </div>
               );
@@ -618,64 +629,66 @@ export const CardDetailModal = ({
 
           </div>
 
-          <div className={styles.sidebarColumn}>
-            <div className={styles.sidebarGroup}>
-              <div className={styles.groupTitle}>Add to card</div>
-              <button className={styles.sidebarBtn} onClick={() => setShowMemberMenu(prev => !prev)}>
-                👤 Members
-              </button>
-              <button className={styles.sidebarBtn} onClick={() => setShowLabelMenu(prev => !prev)}>
-                🏷️ Labels
-              </button>
-              <button className={styles.sidebarBtn} onClick={() => setShowChecklistInput(!showChecklistInput)}>
-                ☑ Checklist
-              </button>
-              <button className={styles.sidebarBtn} onClick={() => setShowDatePicker(!showDatePicker)}>
-                🕒 Dates
-              </button>
-            </div>
-
-            {/* Checklist Input */}
-            {showChecklistInput && (
-              <div className={styles.sidebarInputBox}>
-                <input
-                  type="text"
-                  placeholder="Checklist title..."
-                  value={newChecklistTitle}
-                  onChange={(e) => setNewChecklistTitle(e.target.value)}
-                  className={styles.sidebarInput}
-                  autoFocus
-                />
-                <div className={styles.sidebarInputActions}>
-                  <button onClick={handleCreateChecklist} className={styles.createBtn}>Add</button>
-                  <button onClick={() => setShowChecklistInput(false)} className={styles.cancelBtn}>✕</button>
-                </div>
+          {!readOnly && (
+            <div className={styles.sidebarColumn}>
+              <div className={styles.sidebarGroup}>
+                <div className={styles.groupTitle}>Add to card</div>
+                <button className={styles.sidebarBtn} onClick={() => setShowMemberMenu(prev => !prev)}>
+                  👤 Members
+                </button>
+                <button className={styles.sidebarBtn} onClick={() => setShowLabelMenu(prev => !prev)}>
+                  🏷️ Labels
+                </button>
+                <button className={styles.sidebarBtn} onClick={() => setShowChecklistInput(!showChecklistInput)}>
+                  ☑ Checklist
+                </button>
+                <button className={styles.sidebarBtn} onClick={() => setShowDatePicker(!showDatePicker)}>
+                  🕒 Dates
+                </button>
               </div>
-            )}
 
-            {/* Date Picker */}
-            {showDatePicker && (
-              <div className={styles.sidebarInputBox}>
-                <input
-                  type="date"
-                  value={dueDate ? dueDate.split('T')[0] : ''}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className={styles.sidebarInput}
-                />
-                <div className={styles.sidebarInputActions}>
-                  <button onClick={handleSaveDueDate} className={styles.createBtn}>Save</button>
-                  <button onClick={() => setShowDatePicker(false)} className={styles.cancelBtn}>✕</button>
+              {/* Checklist Input */}
+              {showChecklistInput && (
+                <div className={styles.sidebarInputBox}>
+                  <input
+                    type="text"
+                    placeholder="Checklist title..."
+                    value={newChecklistTitle}
+                    onChange={(e) => setNewChecklistTitle(e.target.value)}
+                    className={styles.sidebarInput}
+                    autoFocus
+                  />
+                  <div className={styles.sidebarInputActions}>
+                    <button onClick={handleCreateChecklist} className={styles.createBtn}>Add</button>
+                    <button onClick={() => setShowChecklistInput(false)} className={styles.cancelBtn}>✕</button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className={styles.sidebarGroup}>
-              <div className={styles.groupTitle}>Actions</div>
-              <button className={styles.sidebarBtn} onClick={() => { if (confirm('Delete card?')) onDelete(); }}>
-                🗑️ Delete
-              </button>
+              {/* Date Picker */}
+              {showDatePicker && (
+                <div className={styles.sidebarInputBox}>
+                  <input
+                    type="date"
+                    value={dueDate ? dueDate.split('T')[0] : ''}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className={styles.sidebarInput}
+                  />
+                  <div className={styles.sidebarInputActions}>
+                    <button onClick={handleSaveDueDate} className={styles.createBtn}>Save</button>
+                    <button onClick={() => setShowDatePicker(false)} className={styles.cancelBtn}>✕</button>
+                  </div>
+                </div>
+              )}
+
+              <div className={styles.sidebarGroup}>
+                <div className={styles.groupTitle}>Actions</div>
+                <button className={styles.sidebarBtn} onClick={() => { if (confirm('Delete card?')) onDelete(); }}>
+                  🗑️ Delete
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
