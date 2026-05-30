@@ -1,16 +1,10 @@
 const prisma = require('./prismaClient');
 
-async function run() {
+async function test() {
   try {
-    console.log('Adding shareToken column...');
-    await prisma.$executeRawUnsafe(`
-      ALTER TABLE "Board" ADD COLUMN IF NOT EXISTS "shareToken" TEXT;
-    `);
-    console.log('Creating unique index...');
-    await prisma.$executeRawUnsafe(`
-      CREATE UNIQUE INDEX IF NOT EXISTS "Board_shareToken_key" ON "Board"("shareToken");
-    `);
-    console.log('SUCCESS!');
+    const board = await prisma.board.findFirst();
+    console.log('BOARD FIELDS:', Object.keys(board));
+    console.log('BOARD shareToken:', board.shareToken);
   } catch (err) {
     console.error('ERROR:', err);
   } finally {
@@ -18,4 +12,4 @@ async function run() {
   }
 }
 
-run();
+test();
