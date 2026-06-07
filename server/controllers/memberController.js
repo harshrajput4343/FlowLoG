@@ -9,6 +9,7 @@
 
 const prisma = require('../prismaClient');
 const { getCache, setCache, deleteCache, deleteCachePattern } = require('../utils/redisClient');
+const { sendCardAssignmentEmail } = require('../utils/emailService');
 
 // ─── GET /api/members/board/:boardId ─────────────────────────────────────────
 exports.getBoardMembers = async (req, res) => {
@@ -40,6 +41,41 @@ exports.assignMemberToCard = async (req, res) => {
       include: { user: true }
     });
     await deleteCachePattern('board:*:user:*');
+
+    // ── Email notification (non-blocking, never crashes route) ─────
+    try {
+      const card = await prisma.card.findUnique({
+        where: { id: cardId },
+        include: { list: { include: { board: true } } },
+      });
+
+      let assignerName = 'A teammate';
+      if (req.userId) {
+        const assigner = await prisma.user.findUnique({
+          where: { id: req.userId },
+          select: { name: true },
+        });
+        if (assigner && assigner.name) assignerName = assigner.name;
+      }
+
+      if (card && card.list && card.list.board && cardMember.user && cardMember.user.email) {
+        await sendCardAssignmentEmail({
+          toEmail:         cardMember.user.email,
+          toName:          cardMember.user.name || null,
+          cardTitle:       card.title,
+          cardDescription: card.description,
+          dueDate:         card.dueDate,
+          boardTitle:      card.list.board.title,
+          boardId:         card.list.board.id,
+          listTitle:       card.list.title,
+          assignerName,
+        });
+      }
+    } catch (emailError) {
+      console.error('[Email] Card assignment notification failed:', emailError.message);
+    }
+    // ── End email notification ──────────────────────────────────────
+
     res.status(201).json(cardMember.user);
   } catch (error) {
     if (error.code === 'P2002') {
