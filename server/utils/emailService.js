@@ -10,6 +10,7 @@ if (isEmailConfigured) {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true, // use SSL
+      family: 4,    // force IPv4 — many cloud hosts lack IPv6 outbound
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
