@@ -1,4 +1,9 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+
+// Force IPv4 DNS resolution — most cloud hosts (Render, Railway, etc.)
+// lack IPv6 outbound, causing ENETUNREACH / ETIMEDOUT to smtp.gmail.com
+dns.setDefaultResultOrder('ipv4first');
 
 const isEmailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
 
@@ -10,7 +15,6 @@ if (isEmailConfigured) {
       host: 'smtp.gmail.com',
       port: 465,
       secure: true, // use SSL
-      family: 4,    // force IPv4 — many cloud hosts lack IPv6 outbound
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
