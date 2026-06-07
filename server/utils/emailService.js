@@ -97,4 +97,94 @@ const sendInvitationEmail = async ({ toEmail, inviterName, workspaceName, invite
   }
 };
 
-module.exports = { sendInvitationEmail, isEmailConfigured };
+const sendCardAssignmentEmail = async ({
+  toEmail,
+  toName,
+  cardTitle,
+  cardDescription,
+  dueDate,
+  boardTitle,
+  boardId,
+  listTitle,
+  assignerName,
+}) => {
+  if (!transporter) {
+    console.warn('[Email] Transporter not configured — skipping card assignment email');
+    return;
+  }
+
+  const formattedDate = dueDate
+    ? new Date(dueDate).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : 'No due date set';
+
+  const descriptionText = cardDescription || 'No description added';
+  const taskUrl = `${process.env.FRONTEND_URL}/b/${boardId}`;
+  const greeting = toName ? toName : 'there';
+
+  const mailOptions = {
+    from: `"FlowLoG" <${process.env.EMAIL_USER}>`,
+    to: toEmail,
+    subject: `You've been assigned a task on ${boardTitle}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #0079bf 0%, #0063a0 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">Flow<span style="color: #22c55e;">LoG</span></h1>
+        </div>
+        <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 12px 12px;">
+          <h2 style="color: #1f2937; margin-top: 0;">You have a new task assigned 📋</h2>
+          <p style="color: #4b5563; font-size: 16px;">
+            Hi <strong>${greeting}</strong>, <strong>${assignerName}</strong> assigned you to a card.
+          </p>
+          <div style="background: white; border-left: 4px solid #0079bf; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: #0079bf; margin: 0 0 12px 0; font-size: 20px;">${cardTitle}</h3>
+            <p style="color: #4b5563; margin: 0 0 12px 0;">
+              <strong>Description:</strong> ${descriptionText}
+            </p>
+            <p style="color: #4b5563; margin: 0 0 8px 0;">
+              <strong>📅 Due Date:</strong> ${formattedDate}
+            </p>
+            <p style="color: #4b5563; margin: 0 0 8px 0;">
+              <strong>📋 List:</strong> ${listTitle}
+            </p>
+            <p style="color: #4b5563; margin: 0;">
+              <strong>📁 Board:</strong> ${boardTitle}
+            </p>
+          </div>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${taskUrl}"
+               style="background: #0079bf;
+                      color: white;
+                      padding: 14px 32px;
+                      border-radius: 8px;
+                      text-decoration: none;
+                      font-size: 16px;
+                      font-weight: bold;
+                      display: inline-block;">
+              View Task
+            </a>
+          </div>
+          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
+            This is an automated notification from FlowLoG
+          </p>
+        </div>
+      </div>
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('[Email] Card assignment notification sent: %s', info.messageId);
+  } catch (error) {
+    console.error('[Email] Failed to send card assignment email:', {
+      message: error.message,
+      code: error.code,
+    });
+    // Intentionally swallowed — card assignment must not fail due to email
+  }
+};
+
+module.exports = { sendInvitationEmail, sendCardAssignmentEmail, isEmailConfigured };
