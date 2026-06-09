@@ -17,7 +17,10 @@ const prisma = require('../prismaClient');
 
 // ── Config ──────────────────────────────────────────────────────────────
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL = process.env.GROQ_MODEL || 'gemma2-9b-it';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || (process.env.GROQ_API_KEY && (process.env.GROQ_API_KEY.startsWith('AQ.') || process.env.GROQ_API_KEY.startsWith('AIza')) ? process.env.GROQ_API_KEY : null);
+const GROQ_API_KEY = !GEMINI_API_KEY ? process.env.GROQ_API_KEY : null;
+
+const MODEL = process.env.GROQ_MODEL || process.env.GEMINI_MODEL || (GEMINI_API_KEY ? 'models/gemma-4-26b-a4b-it' : 'gemma2-9b-it');
 
 const FALLBACK_ANSWER =
   "I couldn't process that. Try asking about your boards, lists, or cards.";
@@ -222,44 +225,87 @@ function extractJSON(text) {
 }
 
 /**
- * Call Groq API (OpenAI-compatible).
+ * Call the selected LLM API (Google AI Studio/Gemini or Groq).
  */
 async function callLLM(systemPrompt, userMessage) {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error('GROQ_API_KEY is not configured');
+  if (GEMINI_API_KEY) {
+    const modelName = MODEL.startsWith('models/') ? MODEL : `models/${MODEL}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: userMessage }],
+          },
+        ],
+        system_instruction: {
+          parts: [{ text: systemPrompt }],
+        },
+        generationConfig: {
+          temperature: 0.0,
+          maxOutputTokens: 1024,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text().catch(() => '');
+      throw new Error(`Gemini API error ${response.status}: ${errBody}`);
+    }
+
+    const data = await response.json();
+    if (
+      !data.candidates ||
+      !data.candidates[0] ||
+      !data.candidates[0].content ||
+      !data.candidates[0].content.parts ||
+      !data.candidates[0].content.parts[0]
+    ) {
+      throw new Error('Unexpected Gemini API response structure');
+    }
+
+    return data.candidates[0].content.parts[0].text;
+  } else if (GROQ_API_KEY) {
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+        temperature: 0,
+        max_tokens: 1024,
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text().catch(() => '');
+      throw new Error(`Groq API error ${response.status}: ${errBody}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Unexpected Groq API response structure');
+    }
+
+    return data.choices[0].message.content;
+  } else {
+    throw new Error('Neither GEMINI_API_KEY nor GROQ_API_KEY is configured');
   }
-
-  const response = await fetch(GROQ_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-      temperature: 0,
-      max_tokens: 1024,
-    }),
-  });
-
-  if (!response.ok) {
-    const errBody = await response.text().catch(() => '');
-    throw new Error(`Groq API error ${response.status}: ${errBody}`);
-  }
-
-  const data = await response.json();
-
-  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-    throw new Error('Unexpected Groq API response structure');
-  }
-
-  return data.choices[0].message.content;
 }
+
 
 // ── Main handler ────────────────────────────────────────────────────────
 
