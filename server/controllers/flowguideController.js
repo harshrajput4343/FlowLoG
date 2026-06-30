@@ -264,13 +264,20 @@ async function callLLM(systemPrompt, userMessage) {
       !data.candidates ||
       !data.candidates[0] ||
       !data.candidates[0].content ||
-      !data.candidates[0].content.parts ||
-      !data.candidates[0].content.parts[0]
+      !data.candidates[0].content.parts
     ) {
       throw new Error('Unexpected Gemini API response structure');
     }
 
-    return data.candidates[0].content.parts[0].text;
+    const parts = data.candidates[0].content.parts;
+    const textParts = parts.filter(p => !p.thought && p.text);
+    if (textParts.length > 0) {
+      return textParts.map(p => p.text).join('').trim();
+    }
+    if (parts[0] && parts[0].text) {
+      return parts[0].text;
+    }
+    throw new Error('No text content in Gemini API response');
   } else if (GROQ_API_KEY) {
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
