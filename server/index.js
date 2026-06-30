@@ -42,6 +42,7 @@ app.use('/api/invitations', require('./routes/invitations'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/subscription', require('./routes/subscription'));
 app.use('/api/payment', require('./routes/payment'));
+app.use('/api/flowguide', require('./routes/flowguide'));
 
 // Start Server
 app.listen(PORT, () => {
